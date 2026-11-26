@@ -7,7 +7,7 @@ Jump, fly, and dash to the beat across desktop and mobile — zero downloads req
 
 <br/>
 
-[![Play NEON DASH](https://shields.io▶_PLAY_NEON_DASH-00F5D4?style=for-the-badge&logoColor=0A0A12)](https://github.io)
+[![Play NEON DASH]https://pamo1705.github.io/neon-dash/
 &nbsp;
 [![Platform](https://shields.ioDesktop_%26_Mobile-Browser-7B2CBF?style=for-the-badge)](https://github.io)
 &nbsp;
