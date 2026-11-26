@@ -1,29 +1,67 @@
-# NEON DASH
+<div align="center">
 
-A fast-paced browser rhythm platformer inspired by Geometry Dash. Jump, fly, and dash to the beat through obstacle courses on both desktop and mobile—no downloads or installs required.
+# ⚡ NEON DASH ⚡
 
-[![Play NEON DASH](https://shields.io▶_Play_NEON_DASH-00F5D4?style=for-the-badge&logoColor=0A0A12)](https://pamo1705.github.io/neon-dash/)
+**A fast-paced browser rhythm platformer inspired by Geometry Dash.**  
+Jump, fly, and dash to the beat across desktop and mobile — zero downloads required.
 
-## Gameplay & Features
+<br/>
 
-- **STEREO PULSE (Main Stage):** Hand-crafted 60s stage with escalating speed, jump pads, mid-air boost rings, and music-synced color shifts.
-- **Cube & Ship Modes:** Portals switch mid-run between precision cube platforming and jetpack flight.
-- **Endless Mode:** Infinite procedural mode with escalating speed and high-score tracking.
-- **Practice Mode:** Automatic checkpoints so you can master tricky sections.
-- **Cube Skins:** Unlockable neon designs and color themes saved locally in your browser.
-- **Instant Respawn:** Crash and jump right back in after 0.35s with zero pop-up menus slowing you down.
+[![Play NEON DASH](https://shields.io▶_PLAY_NEON_DASH-00F5D4?style=for-the-badge&logoColor=0A0A12)](https://github.io)
+&nbsp;
+[![Platform](https://shields.ioDesktop_%26_Mobile-Browser-7B2CBF?style=for-the-badge)](https://github.io)
+&nbsp;
+[![Tech](https://shields.ioHTML5_Canvas_%C2%B7_120Hz-0B0F19?style=for-the-badge&labelColor=1F2937)](https://github.io)
 
-## Controls
+</div>
 
-| Platform | Action |
-| :--- | :--- |
-| **Desktop** | `Space`, `W`, `Up Arrow`, or `Left Click` to jump / fly (hold for continuous jumps) |
-| **Shortcuts** | `R` to quick-restart · `P` to pause · `M` to toggle audio |
-| **Mobile / Tablet** | Tap or hold anywhere on the screen (landscape recommended) |
+<br/>
 
-## Run Locally
+---
 
-No build tools or local server needed:
+## ✨ Highlights
 
-1. Clone or download this repository.
-2. Double-click `index.html` to open it in any modern browser.
+<table>
+  <tr>
+    <td width="50%">
+      <h3>🎵 STEREO PULSE</h3>
+      <p>Hand-crafted 60-second stage featuring escalating speed, jump pads, mid-air boost rings, and music-synced color shifts.</p>
+    </td>
+    <td width="50%">
+      <h3>🚀 Cube & Ship Modes</h3>
+      <p>Vortex portals seamlessly switch mid-run between snappy cube platforming and jetpack flight physics.</p>
+    </td>
+  </tr>
+  <tr>
+    <td width="50%">
+      <h3>∞ Endless & Practice</h3>
+      <p>Chase high scores in procedural Endless mode or master tough sections with auto-checkpoints in Practice mode.</p>
+    </td>
+    <td width="50%">
+      <h3>🎨 Skins & Instant Respawn</h3>
+      <p>Unlockable neon cube skins saved locally in your browser, paired with 0.35s instant respawns.</p>
+    </td>
+  </tr>
+</table>
+
+---
+
+## 🎮 Controls
+
+| Device | Input | Action |
+| :--- | :--- | :--- |
+| **Desktop** | `Space` · `W` · `↑` · `Left Click` | Jump / Fly *(hold for continuous jumps)* |
+| **Shortcuts** | `R` / `P` / `M` | Quick Restart · Pause · Mute / Unmute |
+| **Mobile & Tablet** | `Tap` / `Hold` anywhere | Jump / Fly *(landscape recommended)* |
+
+---
+
+## 🚀 Run Locally
+
+No build tools, dependencies, or local server needed:
+
+```bash
+git clone https://github.com
+```
+
+Open **`index.html`** directly in Chrome, Edge, Firefox, or Safari.
