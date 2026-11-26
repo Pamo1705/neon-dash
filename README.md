@@ -1,29 +1,29 @@
 # NEON DASH
 
-Ein schneller Rhythm-Platformer im Browser, inspiriert von Geometry Dash. Du springst und fliegst im Takt eines synthlastigen Soundtracks durch Hindernisparcours – komplett ohne Installation direkt auf PC und Handy spielbar.
+A fast-paced browser rhythm platformer inspired by Geometry Dash. Jump, fly, and dash to the beat through obstacle courses on both desktop and mobile—no downloads or installs required.
 
-**Jetzt spielen:** [Hier deinen GitHub-Pages- oder itch.io-Link eintragen](https://github.io)
+[![Play NEON DASH](https://shields.io▶_Play_NEON_DASH-00F5D4?style=for-the-badge&logoColor=0A0A12)](https://github.io)
 
 ## Gameplay & Features
 
-- **STEREO PULSE (Main Stage):** Handgebautes Level mit steigendem Tempo, Jump-Pads, Mid-Air-Boost-Ringen und Farbwechseln passend zur Musik.
-- **Cube- & Ship-Modus:** Portale wechseln mitten im Lauf zwischen klassischem Cube-Platforming und einem Jetpack-Flugmodus.
-- **Endless Mode:** Endloser Highscore-Modus mit zufällig verketteten Hindernis-Passagen.
-- **Practice Mode:** Automatische Checkpoints zum Üben schwieriger Stellen.
-- **6 Cube-Skins:** Verschiedene Neon-Designs und Farbschemata, lokal im Browser gespeichert.
-- **Direkter Respawn:** Nach einem Crash startet der nächste Versuch ohne Wartezeit oder nervige Pop-ups.
+- **STEREO PULSE (Main Stage):** Hand-crafted level with escalating speed, jump pads, mid-air boost rings, and music-synced color shifts.
+- **Cube & Ship Modes:** Portals switch mid-run between precision cube platforming and jetpack flight.
+- **Endless Mode:** Infinite high-score mode with procedurally chained obstacle patterns.
+- **Practice Mode:** Automatic checkpoints so you can master tricky sections.
+- **6 Cube Skins:** Unlockable neon designs and color themes saved locally in your browser.
+- **Instant Respawn:** Crash and jump right back in after 0.35s with zero pop-up menus slowing you down.
 
-## Steuerung
+## Controls
 
-| Plattform | Aktion |
+| Platform | Action |
 | :--- | :--- |
-| **PC** | `Leertaste`, `W`, `Pfeil hoch` oder `Linksklick` zum Springen / Fliegen (gedrückt halten für Dauer-Sprünge) |
-| **PC (Shortcuts)** | `R` für sofortigen Neustart · `P` für Pause · `M` für Ton an/aus |
-| **Handy / Tablet** | Auf den Bildschirm tippen oder gedrückt halten |
+| **Desktop** | `Space`, `W`, `Up Arrow`, or `Left Click` to jump / fly (hold for continuous jumps) |
+| **Shortcuts** | `R` to quick-restart · `P` to pause · `M` to toggle audio |
+| **Mobile / Tablet** | Tap or hold anywhere on the screen |
 
-## Lokal starten
+## Run Locally
 
-Es wird kein Build-Schritt und kein Server benötigt:
+No build tools or local server needed:
 
-1. Repository herunterladen oder klonen.
-2. `index.html` per Doppelklick im Browser öffnen.
+1. Clone or download this repository.
+2. Double-click `index.html` to open it in any modern browser.
