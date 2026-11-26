@@ -10,7 +10,7 @@
 
 <br/>
 
-[![PLAY NEON DASH](https://shields.io▶%20%20PLAY%20NEON%20DASH-00F5D4?style=for-the-badge)](https://github.io)
+[![PLAY NEON DASH](https://shields.io▶%20%20PLAY%20NEON%20DASH-NOW-00F5D4?style=for-the-badge&labelColor=090D16)](https://pamo1705.github.io/neon-dash/)
 
 <br/>
 
