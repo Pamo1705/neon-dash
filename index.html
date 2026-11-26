@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+<meta name="theme-color" content="#05010f" />
+<title>NEON DASH</title>
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+<div id="app">
+  <canvas id="game"></canvas>
+
+  <!-- In-game HUD -->
+  <div id="hud" class="hidden">
+    <div id="progressWrap">
+      <div id="progressBar"><div id="progressFill"></div></div>
+      <div id="pctLabel">0%</div>
+    </div>
+    <div id="attemptLabel">Attempt 1</div>
+  </div>
+
+  <!-- Sound toggle (always visible) -->
+  <button id="soundBtn" class="icon-btn" aria-label="Toggle sound" title="Toggle sound (M)">
+    <span id="soundIcon">&#128263;</span>
+  </button>
+
+  <!-- Pause button (in-game) -->
+  <button id="pauseBtn" class="icon-btn hidden" aria-label="Pause" title="Pause (P)">
+    <span>&#10073;&#10073;</span>
+  </button>
+
+  <!-- Start / menu overlay -->
+  <div id="menu" class="overlay">
+    <div class="menu-inner">
+      <div class="brand">
+        <h1 class="title" data-text="NEON DASH">NEON DASH</h1>
+        <p class="tagline">A rhythm-action neon gauntlet</p>
+      </div>
+
+      <div class="glass-card mode-card">
+        <div class="mode-row">
+          <button id="playStage" class="big-btn stage-btn">
+            <span class="btn-icon">&#9654;</span>
+            <span class="btn-title">STEREO PULSE</span>
+            <span class="btn-sub">60s hand-crafted stage</span>
+          </button>
+          <button id="playEndless" class="big-btn endless-btn">
+            <span class="btn-icon">&#8734;</span>
+            <span class="btn-title">ENDLESS</span>
+            <span class="btn-sub">Procedural &middot; escalating</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="glass-card panel">
+        <div class="panel-head">CUBE SKIN</div>
+        <div class="skin-stage">
+          <canvas id="skinPreview" width="220" height="220"></canvas>
+          <div class="skin-stage-glow"></div>
+        </div>
+        <div id="skins" class="skins"></div>
+      </div>
+
+      <div class="glass-card menu-foot">
+        <label class="practice-row">
+          <input type="checkbox" id="practiceToggle" />
+          <span class="switch"></span>
+          <span class="practice-label"><b>Practice Mode</b> <em>(auto-checkpoints)</em></span>
+        </label>
+        <div id="bestStats" class="best-stats"></div>
+      </div>
+
+      <div class="controls-hint glass-chip">
+        <span><b>SPACE / W / &uarr; / CLICK</b> jump &amp; fly</span>
+        <span><b>R</b> restart</span>
+        <span><b>P</b> pause</span>
+        <span><b>M</b> mute</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pause overlay -->
+  <div id="pause" class="overlay hidden">
+    <div class="pause-inner glass-card">
+      <h2>PAUSED</h2>
+      <div class="mode-row">
+        <button id="resumeBtn" class="big-btn stage-btn"><span class="btn-title">RESUME</span></button>
+        <button id="restartBtn" class="big-btn endless-btn"><span class="btn-title">RESTART</span></button>
+        <button id="quitBtn" class="big-btn ghost-btn"><span class="btn-title">MENU</span></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Victory overlay -->
+  <div id="victory" class="overlay hidden">
+    <div class="pause-inner glass-card victory-card">
+      <h2 class="victory-title">STAGE CLEAR</h2>
+      <p id="victoryStats" class="tagline"></p>
+      <div class="mode-row">
+        <button id="victoryMenuBtn" class="big-btn ghost-btn"><span class="btn-title">MENU</span></button>
+        <button id="victoryReplayBtn" class="big-btn endless-btn"><span class="btn-title">REPLAY</span></button>
+      </div>
+    </div>
+  </div>
+
+  <div id="rotateHint" class="rotate-hint hidden">Rotate your device for the best experience</div>
+</div>
+<script src="game.js"></script>
+</body>
+</html>
