@@ -10,15 +10,7 @@
 
 <br/>
 
-[![PLAY NEON DASH](https://shields.io▶%20%20PLAY%20NEON%20DASH-00F5D4?style=for-the-badge)](https://pamo1705.github.io/neon-dash/)
-
-<br/>
-
-![Desktop & Mobile](https://shields.ioPLATFORM-DESKTOP_%26_MOBILE-111827?style=flat-square&labelColor=0B0F19&color=7C3AED)
-&nbsp;
-![120Hz Physics](https://shields.ioENGINE-120HZ_FIXED_TIMESTEP-111827?style=flat-square&labelColor=0B0F19&color=06B6D4)
-&nbsp;
-![Zero Install](https://shields.ioPLAY-INSTANT_BROWSER-111827?style=flat-square&labelColor=0B0F19&color=10B981)
+[![PLAY NEON DASH](https://shields.io▶%20%20PLAY%20NEON%20DASH-00F5D4?style=for-the-badge)](https://github.io)
 
 <br/>
 
@@ -60,11 +52,3 @@
 | **Desktop** | `Space` · `W` · `↑` · `Left Click` | Jump / Fly *(hold for continuous jumps)* |
 | **Quick Keys** | `R` · `P` · `M` | Instant Restart · Pause · Mute / Unmute |
 | **Mobile & Tablet** | `Tap` / `Hold` anywhere | Jump / Fly *(landscape recommended)* |
-
----
-
-<div align="center">
-
-**[▶ Launch NEON DASH in Your Browser](https://pamo1705.github.io/neon-dash/)**
-
-</div>
