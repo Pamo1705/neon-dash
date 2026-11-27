@@ -383,6 +383,50 @@ function buildStage() {
   return { ents: ents, endX: endX, startX: 0, shipStart: shipStart * B };
 }
 
+
+function buildExtraStage(level) {
+  var B = CFG.BLOCK, ents = [], cx = 12;
+  function add(e) { ents.push(e); }
+  function spike(x, n, base) { n = n || 1; base = base || 0; for (var i = 0; i < n; i++) add({ type: 'spike', x: (x + i) * B, baseY: base, w: B, h: B }); }
+  function block(x, top, w, h) { add({ type: 'block', x: x * B, y: -top * B, w: (w || 1) * B, h: (h || 1) * B }); }
+  function pad(x) { add({ type: 'pad', x: x * B, y: 0, w: B }); }
+  function ring(x, y) { add({ type: 'ring', x: x * B + B / 2, y: -y * B, r: B * 0.55, used: false }); }
+  function portal(type, x) { add({ type: type, x: x * B, y: -B * 2.6, w: B, h: B * 3.4 }); }
+  // Each course has its own rhythm and obstacle sequence.
+  var patterns = level === 1 ? [
+    ['s',1,7],['s',2,9],['b',1,2,1,8],['s',2,9],['b',2,1,2,8],['s',3,11],
+    ['p',0,7],['r',4,0,3,8],['s',2,9],['b',1,3,1,9],['s',1,7],['s',3,11],
+    ['p',0,7],['r',5,0,3,9],['b',2,2,2,9],['s',2,9],['s',1,7],['s',2,9]
+  ] : level === 2 ? [
+    ['s',2,8],['b',1,1,1,6],['s',3,10],['b',2,2,2,8],['s',2,8],['p',0,7],
+    ['r',5,0,3,8],['s',3,10],['b',1,3,1,8],['s',2,8],['b',3,1,3,9],
+    ['s',3,10],['p',0,7],['r',5,0,3,8],['s',2,8],['b',2,2,2,8],['s',3,10]
+  ] : [
+    ['s',1,7],['s',2,8],['b',1,2,1,7],['s',3,10],['p',0,7],['r',5,0,3,8],
+    ['s',2,8],['b',2,1,2,7],['s',3,10],['b',1,3,1,8],['s',2,8],['p',0,7],
+    ['r',5,0,3,8],['s',3,10],['b',2,2,2,8],['s',3,10],['s',2,8]
+  ];
+  for (var i = 0; i < patterns.length; i++) {
+    var p = patterns[i], w = p[p.length - 1];
+    if (p[0] === 's') spike(cx, p[1]);
+    else if (p[0] === 'b') block(cx, p[1], p[2], p[3]);
+    else if (p[0] === 'p') pad(cx);
+    else if (p[0] === 'r') { ring(cx + 2, p[1]); spike(cx + 3, p[3]); }
+    cx += w;
+  }
+  // A short flight section gives the final course a different feel.
+  if (level === 3) {
+    portal('shipPortal', cx); cx += 7;
+    block(cx, 7, 7, 1); block(cx + 9, 1, 5, 1); spike(cx + 10, 1, -B); cx += 16;
+    block(cx, 7, 5, 1); block(cx + 7, 1, 4, 1); spike(cx + 8, 1, -B); cx += 14;
+    portal('cubePortal', cx); cx += 8;
+  }
+  spike(cx, 2); cx += 10; spike(cx, 1); cx += 8;
+  var endBx = cx + 5;
+  portal('endPortal', endBx);
+  return { ents: ents, endX: endBx * B, startX: 0, shipStart: level === 3 ? (patterns.length ? (12 + 0) * B : 0) : 0 };
+}
+
 function makeChunk(bx, diff) {
   var B = CFG.BLOCK, ents = [];
   function add(e) { ents.push(e); }
@@ -445,7 +489,7 @@ var player = {
 var hudPctCache = '', hudWidthCache = '', hudAttemptCache = '';
 
 var Game = {
-  state: 'menu', mode: 'stage', ents: [], endX: 1, startX: 0, shipStart: 0,
+  state: 'menu', mode: 'stage', selectedLevel: 0, ents: [], endX: 1, startX: 0, shipStart: 0,
   speedMul: 1, attempt: 0, progress: 0, maxProgress: 0,
   hitStop: 0, shake: 0, respawnTimer: 0,
   camX: 0, camY: -GROUND_SCREEN, viewW: 1280,
@@ -464,7 +508,7 @@ var Game = {
     this.hitStop = 0; this.shake = 0;
     particles.length = 0;
     if (mode === 'stage') {
-      var lv = buildStage();
+      var lv = this.selectedLevel === 0 ? buildStage() : buildExtraStage(this.selectedLevel);
       this.ents = lv.ents;
       this.endX = lv.endX;
       this.startX = lv.startX;
@@ -2238,6 +2282,12 @@ function buildSkinUI() {
 
 function wireUI() {
   document.getElementById('playStage').addEventListener('click', function () { Game.startRun('stage'); });
+  var levelButtons = document.querySelectorAll('[data-level]');
+  for (var li = 0; li < levelButtons.length; li++) levelButtons[li].addEventListener('click', function () {
+    Game.selectedLevel = Number(this.getAttribute('data-level')) || 0;
+    for (var j = 0; j < levelButtons.length; j++) levelButtons[j].classList.toggle('selected-level', levelButtons[j] === this);
+    document.getElementById('playStage').querySelector('.btn-sub').textContent = 'Level ' + (Game.selectedLevel + 1) + ' · ' + ['Stereo Pulse','Neon Rush','Gravity Break','Skyline Shift'][Game.selectedLevel];
+  });
   document.getElementById('playEndless').addEventListener('click', function () { Game.startRun('endless'); });
   elSoundBtn.addEventListener('click', function () { Audio.toggle(); });
   elPauseBtn.addEventListener('click', function () { Game.pause(); });
