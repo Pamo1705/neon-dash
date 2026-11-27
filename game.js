@@ -467,26 +467,56 @@ function buildExtraStage(level) {
 function makeChunk(bx, diff) {
   var B = CFG.BLOCK, ents = [];
   function add(e) { ents.push(e); }
-  function spike(x, n, base) { n = n || 1; base = base || 0; for (var i = 0; i < n; i++) add({ type: 'spike', x: (x + i) * B, baseY: base, w: B, h: B }); }
-  function block(x, top, w, h) { w = w || 1; h = h || 1; add({ type: 'block', x: x * B, y: -top * B, w: w * B, h: h * B }); }
+  function spike(x, n, base) {
+    n = n || 1; base = base || 0;
+    for (var i = 0; i < n; i++) add({ type: 'spike', x: (x + i) * B, baseY: base, w: B, h: B });
+  }
+  function block(x, top, w, h) {
+    add({ type: 'block', x: x * B, y: -top * B, w: (w || 1) * B, h: (h || 1) * B });
+  }
   function pad(x) { add({ type: 'pad', x: x * B, y: 0, w: B }); }
   function ring(x, by) { add({ type: 'ring', x: x * B + B / 2, y: -by * B, r: B * 0.55, used: false }); }
-  var r = Math.random();
-  var w;
-  if (diff < 0.25) {
-    if (r < 0.5) { spike(bx, 1); w = 8; }
-    else { block(bx, 1, 2, 1); w = 8; }
-  } else if (diff < 0.55) {
-    if (r < 0.4) { spike(bx, 2); w = 9; }
-    else if (r < 0.7) { block(bx, 1, 1, 1); block(bx + 3, 2, 1, 1); w = 9; }
-    else { pad(bx); spike(bx + 3, 1); w = 9; }
+
+  // Every chunk is a self-contained, readable encounter followed by a
+  // generous runway. Avoid stacking hazards at the end of one chunk and
+  // the start of the next (the old random combinations could do exactly that).
+  var r = Math.random(), width = 9;
+  var tier = clamp(diff, 0, 1);
+
+  // Occasional clean runway gives the player time to recover and makes
+  // the rhythm less relentlessly punishing.
+  if (r < 0.14) {
+    width = 9;
+  } else if (r < 0.39) {
+    spike(bx, 1);
+    width = 9;
+  } else if (r < 0.59) {
+    spike(bx, 2);
+    width = 10;
+  } else if (r < 0.76) {
+    block(bx, 1, 1, 1);
+    width = 9;
+  } else if (r < 0.88) {
+    // A low platform followed by a separate landing runway.
+    block(bx, 1, 2, 1);
+    width = 10;
+  } else if (r < 0.96) {
+    // Optional aerial boost: the ring is safe to ignore.
+    pad(bx);
+    ring(bx + 2, 4);
+    width = 11;
+  } else if (tier > 0.65) {
+    // A harder but still isolated double obstacle; never chain it
+    // directly into another hazard.
+    spike(bx, 2);
+    block(bx + 4, 1, 1, 1);
+    width = 12;
   } else {
-    if (r < 0.3) { spike(bx, 2); block(bx + 4, 1, 2, 1); w = 10; }
-    else if (r < 0.55) { pad(bx); ring(bx + 2, 4); spike(bx + 3, 2); w = 10; }
-    else if (r < 0.8) { block(bx, 1, 1, 1); block(bx + 2, 2, 1, 1); block(bx + 4, 3, 1, 1); w = 11; }
-    else { spike(bx, 3); w = 11; }
+    spike(bx, 1);
+    width = 9;
   }
-  return { ents: ents, width: w };
+
+  return { ents: ents, width: width };
 }
 
 // ---------- Geometry helpers ----------
@@ -800,7 +830,7 @@ function updatePlaying(dt, pressed) {
     if (Game.progress > Game.maxProgress) Game.maxProgress = Game.progress;
   } else {
     Game.progress = clamp((p.x - Game.startX) / 2200, 0, 1);
-    Game.speedMul = Math.min(1.6, 1 + (p.x - Game.startX) / 26000);
+    Game.speedMul = Math.min(1.35, 1 + (p.x - Game.startX) / 74000);
     Game.endlessEnsure();
     Game.recordProgress();
   }
