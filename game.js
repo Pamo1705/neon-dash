@@ -925,6 +925,47 @@ function setWorldTransform() {
   ctx.setTransform(a, 0, 0, a, (-Game.camX + ox) * a, (-Game.camY + oy) * a);
 }
 
+function drawAtmosphere(w, h, groundCss, pal, beat, lightweight) {
+  // Animated neon aurora ribbons drift independently of the camera.
+  ctx.save();
+  ctx.globalCompositeOperation = 'lighter';
+  var bands = lightweight ? 2 : 3;
+  for (var b = 0; b < bands; b++) {
+    var phase = renderTime * (0.22 + b * 0.07) + b * 2.1;
+    var y = groundCss * (0.28 + b * 0.105);
+    ctx.beginPath();
+    ctx.moveTo(-30, y + Math.sin(phase) * 18 * S);
+    for (var x = 0; x <= w + 80; x += 80) {
+      var waveY = y + Math.sin(phase + x * 0.006) * (18 + b * 5) * S
+        + Math.cos(phase * 0.7 + x * 0.002) * 9 * S;
+      ctx.lineTo(x, waveY);
+    }
+    ctx.strokeStyle = rgb(b % 2 ? pal.accent : pal.grid, (lightweight ? 0.10 : 0.13) + beat * 0.07);
+    ctx.lineWidth = (lightweight ? 2 : 3.5) * S;
+    ctx.stroke();
+  }
+
+  // Slow drifting signal motes add motion without spawning particle objects.
+  var motes = lightweight ? 5 : 9;
+  for (var m = 0; m < motes; m++) {
+    var travel = (renderTime * (10 + (m % 3) * 5) + m * 137) % (w + 40);
+    var mx = travel - 20;
+    var my = groundCss * (0.18 + (m % 5) * 0.105)
+      + Math.sin(renderTime * 0.65 + m * 1.7) * 12 * S;
+    var radius = (1.2 + (m % 3) * 0.55) * S;
+    ctx.globalAlpha = 0.38 + 0.3 * Math.sin(renderTime * 1.8 + m);
+    ctx.fillStyle = rgb(m % 2 ? pal.star : pal.accent);
+    ctx.beginPath();
+    ctx.arc(mx, my, radius, 0, Math.PI * 2);
+    ctx.fill();
+    if (!lightweight) {
+      ctx.globalAlpha *= 0.35;
+      ctx.fillRect(mx - 12 * S, my - 0.5 * S, 9 * S, S);
+    }
+  }
+  ctx.restore();
+}
+
 function drawBackground() {
   var w = canvas.width / DPR, h = canvas.height / DPR;
   ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
@@ -985,6 +1026,7 @@ function drawBackground() {
     ctx.fillRect(0, groundCss - 34 * S, w, Math.max(1, S));
     ctx.fillStyle = rgb(pal.grid, 0.12);
     ctx.fillRect(0, groundCss - 30 * S, w, Math.max(1, S));
+    drawAtmosphere(w, h, groundCss, pal, 0, true);
     // Sparse floating markers, drawn as short line segments rather than effects.
     ctx.strokeStyle = rgb(pal.accent, 0.22);
     ctx.lineWidth = Math.max(1, S);
@@ -1027,6 +1069,8 @@ function drawBackground() {
     drawStars(w, h, groundCss, pal, beat);
   }
   drawFloor(groundCss, w, h, pal, beat);
+
+  drawAtmosphere(w, h, groundCss, pal, beat, false);
 
   // Beat horizon glow
   ctx.globalCompositeOperation = 'lighter';
