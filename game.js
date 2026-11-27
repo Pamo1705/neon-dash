@@ -941,6 +941,29 @@ function drawBackground() {
     ctx.fillRect(0, groundCss, w, 2);
     ctx.fillStyle = rgb(pal.grid, 0.16);
     ctx.fillRect(0, groundCss + 18, w, 1);
+
+    // Lightweight distant skyline: adds depth with a few solid rectangles,
+    // avoiding per-building gradients, shadows, and window loops.
+    var skylineBase = groundCss - 8;
+    var skylineScroll = (Game.camX * 0.10 * S) % 150;
+    for (var bi = -1; bi < Math.ceil(w / 150) + 1; bi++) {
+      var bx = bi * 150 - skylineScroll;
+      var bh = (28 + hash(bi * 13.7 + 4) * 54) * S;
+      var bw = (48 + hash(bi * 7.3 + 2) * 46) * S;
+      ctx.fillStyle = rgb(mix(pal.sky2, pal.grid, 0.18), 0.72);
+      ctx.fillRect(bx, skylineBase - bh, bw, bh);
+      ctx.fillStyle = rgb(pal.grid, 0.28);
+      ctx.fillRect(bx, skylineBase - bh, bw, Math.max(1, 2 * S));
+      // A handful of deterministic lit windows.
+      ctx.fillStyle = rgb(pal.accent, 0.24);
+      for (var wi = 0; wi < 3; wi++) {
+        var wx = bx + (8 + wi * 12) * S;
+        var wy = skylineBase - bh + (10 + wi * 9) * S;
+        if (wx < bx + bw - 4 * S && wy < skylineBase - 4 * S) {
+          ctx.fillRect(wx, wy, Math.max(1, 3 * S), Math.max(1, 4 * S));
+        }
+      }
+    }
     return;
   }
 
@@ -1207,6 +1230,13 @@ function drawBlock(e) {
     ctx.fillRect(e.x + 2, e.y + 2, e.w - 4, e.h - 4);
     ctx.fillStyle = rgb(lowPal.grid, 0.2);
     ctx.fillRect(e.x + 4, e.y + 4, e.w - 8, Math.min(4, e.h - 8));
+    // Small inset panel and corner highlights give blocks more dimension
+    // without blur, gradients, or additional canvas state changes.
+    ctx.fillStyle = rgb(lowPal.sky2, 0.42);
+    ctx.fillRect(e.x + 6, e.y + 8, Math.max(0, e.w - 12), Math.max(1, Math.min(3, e.h * 0.08)));
+    ctx.fillStyle = rgb(lowPal.accent, 0.5);
+    ctx.fillRect(e.x + 5, e.y + 5, 3, 3);
+    ctx.fillRect(e.x + e.w - 8, e.y + 5, 3, 3);
     ctx.strokeStyle = rgb(lowPal.grid, 0.9);
     ctx.lineWidth = 2;
     ctx.strokeRect(e.x + 2, e.y + 2, e.w - 4, e.h - 4);
@@ -1295,6 +1325,13 @@ function drawSpike(e) {
     ctx.moveTo(e.x + e.w * 0.18, e.baseY - 3);
     ctx.lineTo(e.x + e.w * 0.5, e.baseY - e.h * 0.72);
     ctx.lineTo(e.x + e.w * 0.82, e.baseY - 3);
+    ctx.closePath(); ctx.fill();
+    // Dark inset facet makes the hazard read more clearly at low resolution.
+    ctx.fillStyle = 'rgba(0,0,0,0.22)';
+    ctx.beginPath();
+    ctx.moveTo(e.x + e.w * 0.5, e.baseY - e.h * 0.56);
+    ctx.lineTo(e.x + e.w * 0.72, e.baseY - 5);
+    ctx.lineTo(e.x + e.w * 0.5, e.baseY - 5);
     ctx.closePath(); ctx.fill();
     ctx.strokeStyle = rgb(lowPal.accent, 0.95);
     ctx.lineWidth = 2;
