@@ -498,6 +498,16 @@ var Game = {
       this.genBlock += c.width;
       guard++;
     }
+
+    // Endless mode only needs nearby obstacles. Discard passed chunks so
+    // collision checks and both render passes stay bounded during long runs.
+    var keepFrom = player.x - 900;
+    while (this.ents.length) {
+      var first = this.ents[0];
+      var firstWidth = first.w || CFG.BLOCK;
+      if (first.x + firstWidth >= keepFrom) break;
+      this.ents.shift();
+    }
   },
 
   restart: function () {
@@ -1086,12 +1096,11 @@ function drawFloor(groundCss, w, h, pal, beat) {
 
 function drawFilmGrain(w, h) {
   if (!noiseCanvas) return;
+  // A repeating pattern replaces dozens of per-frame drawImage calls.
   ctx.save();
-  ctx.globalAlpha = 0.5;
-  var ox = (Math.random() * 160) | 0, oy = (Math.random() * 160) | 0;
-  for (var y = -oy; y < h; y += 160) {
-    for (var x = -ox; x < w; x += 160) ctx.drawImage(noiseCanvas, x, y);
-  }
+  ctx.globalAlpha = 0.16;
+  ctx.fillStyle = ctx.createPattern(noiseCanvas, 'repeat');
+  ctx.fillRect(0, 0, w, h);
   ctx.restore();
 }
 
