@@ -44,8 +44,8 @@
         <div class="mode-row">
           <button id="playStage" class="big-btn stage-btn">
             <span class="btn-icon">&#9654;</span>
-            <span class="btn-title">STEREO PULSE</span>
-            <span class="btn-sub">60s hand-crafted stage</span>
+            <span class="btn-title">LEVELS</span>
+            <span class="btn-sub">Choose and play a level</span>
             <span class="btn-best" id="stageHighscore">HIGH SCORE · 0%</span>
           </button>
           <button id="playEndless" class="big-btn endless-btn">
@@ -57,11 +57,14 @@
         </div>
       </div>
 
-      <div class="level-select" aria-label="Choose a level">
-        <button class="level-choice selected-level" data-level="0"><b>01</b><span>STEREO PULSE</span><small>CLASSIC</small></button>
-        <button class="level-choice" data-level="1"><b>02</b><span>NEON RUSH</span><small>ADVANCED</small></button>
-        <button class="level-choice" data-level="2"><b>03</b><span>GRAVITY BREAK</span><small>EXPERT</small></button>
-        <button class="level-choice" data-level="3"><b>04</b><span>SKYLINE SHIFT</span><small>EXPERT+</small></button>
+      <div id="levelsPanel" class="levels-panel hidden">
+        <div class="levels-panel-head"><span>SELECT A LEVEL</span><button id="closeLevels" class="levels-close" type="button">BACK</button></div>
+        <div class="level-select" aria-label="Choose a level">
+          <button class="level-choice" data-level="0"><b>01</b><span>STEREO PULSE</span><small>CLASSIC</small></button>
+          <button class="level-choice" data-level="1"><b>02</b><span>NEON RUSH</span><small>ADVANCED</small></button>
+          <button class="level-choice" data-level="2"><b>03</b><span>GRAVITY BREAK</span><small>EXPERT</small></button>
+          <button class="level-choice" data-level="3"><b>04</b><span>SKYLINE SHIFT</span><small>EXPERT+</small></button>
+        </div>
       </div>
 
       <div class="glass-card panel">
