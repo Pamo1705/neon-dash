@@ -449,8 +449,10 @@ function buildExtraStage(level) {
     else if (p[0] === 'r') { ring(cx + 2, p[1]); spike(cx + 3, p[3]); }
     cx += w;
   }
-  // A short flight section gives the final course a different feel.
-  if (level === 3) {
+  // Flight sections give selected courses a different feel.
+  var shipStart = 0;
+  if (level === 3 || level === 9) {
+    shipStart = cx;
     portal('shipPortal', cx); cx += 7;
     block(cx, 7, 7, 1); block(cx + 9, 1, 5, 1); spike(cx + 10, 1, -B); cx += 16;
     block(cx, 7, 5, 1); block(cx + 7, 1, 4, 1); spike(cx + 8, 1, -B); cx += 14;
