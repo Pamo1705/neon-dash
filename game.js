@@ -272,7 +272,8 @@ function updateSoundIcon() {
 // ---------- Particles ----------
 var particles = [];
 function spawnParticle(p) {
-  if (particles.length > 460) particles.shift();
+  var particleLimit = LOW_POWER ? 90 : 240;
+  if (particles.length >= particleLimit) return;
   particles.push(p);
 }
 function burst(x, y, n, color, spd, life, size) {
@@ -798,6 +799,7 @@ function updateCamera(dt) {
 }
 
 // ---------- Render ----------
+var LOW_POWER = (typeof navigator !== 'undefined' && ((navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 4) || (navigator.deviceMemory && navigator.deviceMemory <= 4))) || (typeof matchMedia === 'function' && matchMedia('(pointer: coarse)').matches);
 var DPR = 1, S = 1, viewW = 1280, viewH = 720, skyGrad = null;
 var renderTime = 0;            // seconds, advanced every rendered frame (visual only)
 var lastMode = 'cube';         // detect portal transitions for flash FX
@@ -867,7 +869,8 @@ function buildNoise() {
 }
 
 function resize() {
-  DPR = Math.min(window.devicePixelRatio || 1, 2);
+  // High-DPI canvases multiply the pixels rendered every frame.
+  DPR = Math.min(window.devicePixelRatio || 1, LOW_POWER ? 1 : 1.5);
   var w = canvas.clientWidth || window.innerWidth;
   var h = canvas.clientHeight || window.innerHeight;
   canvas.width = Math.round(w * DPR);
@@ -917,9 +920,13 @@ function drawBackground() {
   }
   ctx.globalCompositeOperation = 'source-over';
 
-  drawStars(w, h, groundCss, pal, beat);
-  drawMegastructures(groundCss, w, pal, beat);
-  drawSkylineEQ(groundCss, w, pal, beat);
+  if (!LOW_POWER) {
+    drawStars(w, h, groundCss, pal, beat);
+    drawMegastructures(groundCss, w, pal, beat);
+    drawSkylineEQ(groundCss, w, pal, beat);
+  } else {
+    drawStars(w, h, groundCss, pal, beat);
+  }
   drawFloor(groundCss, w, h, pal, beat);
 
   // Beat horizon glow
@@ -933,7 +940,7 @@ function drawBackground() {
   ctx.globalAlpha = 1;
   ctx.globalCompositeOperation = 'source-over';
 
-  drawFilmGrain(w, h);
+  if (!LOW_POWER) drawFilmGrain(w, h);
 }
 
 function drawStars(w, h, groundCss, pal, beat) {
@@ -1136,6 +1143,15 @@ function roundRect(c, x, y, w, h, r) {
 }
 
 function drawBlock(e) {
+  if (LOW_POWER) {
+    var lowPal = currentPalette();
+    ctx.fillStyle = rgb(mix(lowPal.floor, lowPal.grid, 0.22), 0.98);
+    ctx.fillRect(e.x + 2, e.y + 2, e.w - 4, e.h - 4);
+    ctx.strokeStyle = rgb(lowPal.grid, 0.85);
+    ctx.lineWidth = 2;
+    ctx.strokeRect(e.x + 2, e.y + 2, e.w - 4, e.h - 4);
+    return;
+  }
   var beat = Audio.getBeat();
   var pal = currentPalette();
   var trim = pal.grid;
@@ -1202,6 +1218,16 @@ function drawBlock(e) {
 }
 
 function drawSpike(e) {
+  if (LOW_POWER) {
+    var lowPal = currentPalette();
+    ctx.fillStyle = '#32172b';
+    ctx.strokeStyle = rgb(lowPal.accent, 0.9);
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(e.x, e.baseY); ctx.lineTo(e.x + e.w, e.baseY); ctx.lineTo(e.x + e.w / 2, e.baseY - e.h);
+    ctx.closePath(); ctx.fill(); ctx.stroke();
+    return;
+  }
   var beat = Audio.getBeat();
   var pal = currentPalette();
   var full = [{ x: e.x, y: e.baseY }, { x: e.x + e.w, y: e.baseY }, { x: e.x + e.w / 2, y: e.baseY - e.h }];
@@ -1584,9 +1610,11 @@ function drawPlayer() {
     lastMode = p.mode;
   }
 
-  drawTrail();
-  drawPlayerReflection(p, sk);
-  drawPlayerAura(p, sk);
+  if (!LOW_POWER) {
+    drawTrail();
+    drawPlayerReflection(p, sk);
+    drawPlayerAura(p, sk);
+  }
 
   ctx.save();
   ctx.translate(p.x, p.y);
@@ -1877,7 +1905,7 @@ function render() {
 }
 
 // ---------- Loop ----------
-var lastT = 0, acc = 0;
+var lastT = 0, acc = 0, lastDraw = 0;
 function frame(now) {
   if (!lastT) lastT = now;
   var dt = (now - lastT) / 1000;
@@ -1900,7 +1928,11 @@ function frame(now) {
     Input.consumePress();
     update(dt, false);
   }
-  render();
+  // Keep simulation/input responsive while limiting costly canvas work on weaker devices.
+  if (!LOW_POWER || now - lastDraw >= 25) {
+    render();
+    lastDraw = now;
+  }
   requestAnimationFrame(frame);
 }
 
