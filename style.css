@@ -515,3 +515,81 @@ html, body {
   .tagline { display: none; }
   .big-btn { padding: 10px 14px; }
 }
+
+/* ---------- Menu refresh: more character, no animated canvas workload ---------- */
+#menu {
+  background:
+    radial-gradient(ellipse at 16% 18%, rgba(34,230,255,0.13), transparent 34%),
+    radial-gradient(ellipse at 84% 24%, rgba(255,47,185,0.12), transparent 36%),
+    radial-gradient(ellipse at 50% 100%, rgba(138,77,255,0.12), transparent 42%),
+    rgba(3,1,12,0.76);
+}
+.menu-inner {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(34,230,255,0.35) transparent;
+  padding: 12px 8px 18px;
+}
+.menu-kicker {
+  color: var(--neon-cyan);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 4px;
+  text-shadow: 0 0 12px rgba(34,230,255,0.55);
+}
+.menu-edition {
+  color: rgba(234,246,255,0.58);
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 2.5px;
+}
+.menu-edition span { color: var(--neon-pink); padding: 0 5px; }
+.panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.panel-count {
+  color: rgba(234,246,255,0.48);
+  font-size: 9px;
+  letter-spacing: 1.5px;
+}
+.skin {
+  flex-direction: column;
+  justify-content: center;
+  gap: 0;
+  padding: 3px 3px 5px;
+  background: linear-gradient(145deg, rgba(255,255,255,0.075), rgba(255,255,255,0.015));
+}
+.skin canvas { width: 76%; height: 76%; }
+.skin-name {
+  display: block;
+  max-width: 100%;
+  color: rgba(234,246,255,0.72);
+  font-size: 8px;
+  line-height: 1.2;
+  font-weight: 800;
+  letter-spacing: 1px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.skin.selected .skin-name { color: var(--neon-cyan); text-shadow: 0 0 8px rgba(34,230,255,0.5); }
+.skin.locked .skin-name { opacity: 0.35; }
+.big-btn:focus-visible, .skin:focus-visible, .icon-btn:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 3px;
+}
+.mode-card, .panel, .menu-foot { box-shadow: 0 10px 34px rgba(0,0,0,0.24), inset 0 0 22px rgba(138,77,255,0.07); }
+
+@media (max-height: 760px) {
+  .menu-inner { gap: 12px; }
+  .skin-stage { height: 112px; margin-bottom: 9px; }
+  #skinPreview { width: 112px; height: 112px; }
+  .panel { padding: 11px 14px 13px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .title, .skin-stage-glow, #progressFill, .victory-card { animation: none !important; }
+  .big-btn, .skin, .icon-btn { transition: none !important; }
+}
