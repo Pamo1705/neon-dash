@@ -796,3 +796,16 @@ html, body, #app {
 .level-choice.selected-level { border-color:var(--neon-pink); background:linear-gradient(180deg,rgba(255,47,185,.18),rgba(10,6,32,.72)); box-shadow:0 0 16px rgba(255,47,185,.22),inset 0 0 12px rgba(255,47,185,.08); }
 .level-choice.selected-level b { color:var(--neon-pink); }
 @media (max-width:420px) { .level-select { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+
+/* Dedicated level picker opened by the LEVELS menu button. */
+.levels-panel { width:100%; padding:14px; border:1px solid rgba(34,230,255,.3); border-radius:16px; background:rgba(7,4,24,.88); box-shadow:0 0 24px rgba(34,230,255,.12),inset 0 0 18px rgba(138,77,255,.08); animation:fadeIn .18s ease; }
+.levels-panel-head { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:12px; color:var(--neon-cyan); font-size:12px; font-weight:900; letter-spacing:3px; }
+.levels-close { border:1px solid rgba(255,255,255,.22); border-radius:8px; padding:6px 12px; background:rgba(255,255,255,.06); color:var(--ink); font-size:10px; font-weight:800; letter-spacing:1px; cursor:pointer; }
+.levels-close:hover { border-color:var(--neon-pink); color:var(--neon-pink); }
+.level-select { width:100%; display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:8px; }
+.level-choice { min-width:0; padding:12px 5px; display:flex; flex-direction:column; align-items:center; gap:4px; border:1px solid rgba(34,230,255,.24); border-radius:12px; color:var(--ink); background:linear-gradient(180deg,rgba(34,230,255,.08),rgba(10,6,32,.7)); cursor:pointer; transition:transform .12s ease,border-color .15s ease,background .15s ease; }
+.level-choice b { color:var(--neon-cyan); font-size:20px; letter-spacing:1px; }
+.level-choice span { font-size:clamp(8px,1.7vw,11px); font-weight:900; letter-spacing:.5px; }
+.level-choice small { color:var(--muted); font-size:9px; letter-spacing:1px; }
+.level-choice:hover { transform:translateY(-2px); border-color:var(--neon-pink); background:rgba(255,47,185,.12); }
+@media(max-width:420px) { .level-select { grid-template-columns:repeat(2,minmax(0,1fr)); } }
