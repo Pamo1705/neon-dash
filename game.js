@@ -83,16 +83,16 @@ loadSave();
 var SKINS = [
   { name: 'CYAN', c1: '#22e6ff', c2: '#0a6b8a', face: 'plain', unlock: 0 },
   { name: 'PINK', c1: '#ff2fb9', c2: '#8a0a5a', face: 'plain', unlock: 0 },
-  { name: 'LIME', c1: '#4dff88', c2: '#0a7a3a', face: 'cross', unlock: 10 },
-  { name: 'GOLD', c1: '#ffe23d', c2: '#8a6a00', face: 'cross', unlock: 18 },
-  { name: 'VIOLET', c1: '#8a4dff', c2: '#3a0a8a', face: 'star', unlock: 26 },
-  { name: 'EMBER', c1: '#ff6a3d', c2: '#8a1a00', face: 'star', unlock: 34 },
-  { name: 'FROST', c1: '#b9f7ff', c2: '#367da8', face: 'diamond', unlock: 42 },
+  { name: 'LIME', c1: '#4dff88', c2: '#0a7a3a', face: 'cross', unlock: 300 },
+  { name: 'GOLD', c1: '#ffe23d', c2: '#8a6a00', face: 'cross', unlock: 100 },
+  { name: 'VIOLET', c1: '#8a4dff', c2: '#3a0a8a', face: 'star', unlock: 150 },
+  { name: 'EMBER', c1: '#ff6a3d', c2: '#8a1a00', face: 'star', unlock: 200 },
+  { name: 'FROST', c1: '#b9f7ff', c2: '#367da8', face: 'diamond', unlock: 250 },
   { name: 'TOXIC', c1: '#c7ff32', c2: '#477900', face: 'bolt', unlock: 50 },
-  { name: 'PLASMA', c1: '#ff66ed', c2: '#6814a0', face: 'eye', unlock: 60 },
-  { name: 'SOLAR', c1: '#ffad42', c2: '#a52b18', face: 'hex', unlock: 70 },
-  { name: 'GHOST', c1: '#e4eaff', c2: '#6875a8', face: 'target', unlock: 82 },
-  { name: 'VOID', c1: '#9b78ff', c2: '#24104f', face: 'flame', unlock: 95 }
+  { name: 'PLASMA', c1: '#ff66ed', c2: '#6814a0', face: 'eye', unlock: 350 },
+  { name: 'SOLAR', c1: '#ffad42', c2: '#a52b18', face: 'hex', unlock: 400 },
+  { name: 'GHOST', c1: '#e4eaff', c2: '#6875a8', face: 'target', unlock: 450 },
+  { name: 'VOID', c1: '#9b78ff', c2: '#24104f', face: 'flame', unlock: 500 }
 ];
 function skinUnlocked(i) {
   var s = SKINS[i];
