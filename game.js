@@ -272,7 +272,7 @@ function updateSoundIcon() {
 // ---------- Particles ----------
 var particles = [];
 function spawnParticle(p) {
-  var particleLimit = LOW_POWER ? 90 : 240;
+  var particleLimit = LOW_POWER ? 65 : 240;
   if (particles.length >= particleLimit) return;
   particles.push(p);
 }
@@ -896,7 +896,7 @@ function buildNoise() {
 
 function resize() {
   // High-DPI canvases multiply the pixels rendered every frame.
-  DPR = Math.min(window.devicePixelRatio || 1, LOW_POWER ? 0.85 : 1.25);
+  DPR = Math.min(window.devicePixelRatio || 1, LOW_POWER ? 0.75 : 1.25);
   var w = canvas.clientWidth || window.innerWidth;
   var h = canvas.clientHeight || window.innerHeight;
   canvas.width = Math.round(w * DPR);
@@ -1993,8 +1993,8 @@ function frame(now) {
     Input.consumePress();
     update(dt, false);
   }
-  // Keep simulation/input responsive while limiting costly canvas work on weaker devices.
-  if (!LOW_POWER || now - lastDraw >= 1000 / 30) {
+  // Render at up to 60 FPS on every device; fixed-step physics stays independent.
+  if (now - lastDraw >= 1000 / 60) {
     render();
     lastDraw = now;
   }
