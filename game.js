@@ -2281,12 +2281,18 @@ function buildSkinUI() {
 }
 
 function wireUI() {
-  document.getElementById('playStage').addEventListener('click', function () { Game.startRun('stage'); });
+  var levelsPanel = document.getElementById('levelsPanel');
+  document.getElementById('playStage').addEventListener('click', function () {
+    levelsPanel.classList.remove('hidden');
+    Audio.start();
+  });
+  document.getElementById('closeLevels').addEventListener('click', function () {
+    levelsPanel.classList.add('hidden');
+  });
   var levelButtons = document.querySelectorAll('[data-level]');
   for (var li = 0; li < levelButtons.length; li++) levelButtons[li].addEventListener('click', function () {
     Game.selectedLevel = Number(this.getAttribute('data-level')) || 0;
-    for (var j = 0; j < levelButtons.length; j++) levelButtons[j].classList.toggle('selected-level', levelButtons[j] === this);
-    document.getElementById('playStage').querySelector('.btn-sub').textContent = 'Level ' + (Game.selectedLevel + 1) + ' · ' + ['Stereo Pulse','Neon Rush','Gravity Break','Skyline Shift'][Game.selectedLevel];
+    Game.startRun('stage');
   });
   document.getElementById('playEndless').addEventListener('click', function () { Game.startRun('endless'); });
   elSoundBtn.addEventListener('click', function () { Audio.toggle(); });
