@@ -502,33 +502,54 @@ function makeChunk(bx, diff) {
   function pad(x) { add({ type: 'pad', x: x * B, y: 0, w: B }); }
   function ring(x, by) { add({ type: 'ring', x: x * B + B / 2, y: -by * B, r: B * 0.55, used: false }); }
 
-  // One challenge per chunk, then a long, guaranteed recovery runway.
-  // Never combine separate hazards inside one jump sequence.
-  var r = Math.random(), width = 12;
+  // Difficulty rises smoothly over the first 500m, then stays at its
+  // toughest setting. Every chunk still has a clear recovery runway.
   var tier = clamp(diff, 0, 1);
-  if (r < 0.14) {
-    width = 12; // clean recovery section
-  } else if (r < 0.43) {
+  var r = Math.random(), width = 12;
+  var cleanChance = 0.24 - tier * 0.12;
+  var singleSpikeEnd = cleanChance + (0.32 - tier * 0.08);
+  var doubleSpikeEnd = singleSpikeEnd + (0.16 + tier * 0.12);
+  var singleBlockEnd = doubleSpikeEnd + (0.17 - tier * 0.04);
+  var doubleBlockEnd = singleBlockEnd + (0.07 + tier * 0.08);
+  var boostEnd = doubleBlockEnd + 0.08;
+
+  if (r < cleanChance) {
+    width = 12; // regular breathing space
+  } else if (r < singleSpikeEnd) {
     spike(bx, 1);
     width = 12;
-  } else if (r < 0.65) {
-    spike(bx, 2);
-    width = 13;
-  } else if (r < 0.82) {
+  } else if (r < doubleSpikeEnd) {
+    spike(bx, tier > 0.72 && r > singleSpikeEnd + (doubleSpikeEnd - singleSpikeEnd) * 0.72 ? 3 : 2);
+    width = 14;
+  } else if (r < singleBlockEnd) {
     block(bx, 1, 1, 1);
     width = 12;
-  } else if (r < 0.92) {
-    block(bx, 1, 2, 1);
-    width = 13;
-  } else {
-    // Optional boost route; the ring is never required to survive.
+  } else if (r < doubleBlockEnd) {
+    block(bx, 1, tier > 0.7 ? 3 : 2, 1);
+    width = tier > 0.7 ? 14 : 13;
+  } else if (r < boostEnd) {
+    // The boost is optional; the ring is never required to survive.
     pad(bx);
     ring(bx + 2, 4);
     width = 14;
+  } else if (tier > 0.28) {
+    // Two distinct beats for experienced runs. Seven clear blocks separate
+    // them, and another seven clear blocks follow the second hazard.
+    if (r < boostEnd + tier * 0.12) {
+      spike(bx, tier > 0.82 ? 3 : 2);
+      block(bx + 10, 1, tier > 0.82 ? 3 : 2, 1);
+      width = 10 + (tier > 0.82 ? 3 : 2) + 7;
+    } else {
+      block(bx, 1, tier > 0.82 ? 3 : 2, 1);
+      spike(bx + 10, tier > 0.82 ? 3 : 2);
+      width = 10 + (tier > 0.82 ? 3 : 2) + 7;
+    }
+  } else {
+    // Early runs remain approachable: a single, readable obstacle.
+    spike(bx, 1);
+    width = 12;
   }
 
-  // Higher distance adds a little variety, not tighter obstacle spacing.
-  if (tier > 0.8 && r > 0.43 && r < 0.65) width = 13;
   return { ents: ents, width: width };
 }
 
@@ -629,7 +650,8 @@ var Game = {
     var ahead = player.x + Math.max(1800, this.viewW + 900);
     var guard = 0;
     while (this.genBlock * CFG.BLOCK < ahead && guard < 40) {
-      var diff = clamp(this.genBlock / 420, 0, 1);
+      // 44px blocks convert to about 0.88m each; reach full difficulty near 500m.
+      var diff = clamp(this.genBlock / 568, 0, 1);
       var c = makeChunk(this.genBlock, diff);
       for (var i = 0; i < c.ents.length; i++) this.ents.push(c.ents[i]);
       this.genBlock += c.width;
