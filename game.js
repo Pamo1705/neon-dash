@@ -635,6 +635,8 @@ var Game = {
 
   refreshMenu: function () {
     elBest.innerHTML = 'BEST STAGE <b>' + save.bestStage + '%</b> &nbsp;&middot;&nbsp; ENDLESS <b>' + save.bestEndless + 'm</b> &nbsp;&middot;&nbsp; ATTEMPT <b>' + (save.attempt || 0) + '</b>';
+    document.getElementById('stageHighscore').textContent = 'HIGH SCORE · ' + save.bestStage + '%';
+    document.getElementById('endlessHighscore').textContent = 'HIGH SCORE · ' + save.bestEndless + 'm';
     buildSkinUI();
   }
 };
