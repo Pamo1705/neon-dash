@@ -506,12 +506,12 @@ function makeChunk(bx, diff) {
   // toughest setting. Every chunk still has a clear recovery runway.
   var tier = clamp(diff, 0, 1);
   var r = Math.random(), width = 12;
-  var cleanChance = 0.24 - tier * 0.12;
-  var singleSpikeEnd = cleanChance + (0.32 - tier * 0.08);
-  var doubleSpikeEnd = singleSpikeEnd + (0.16 + tier * 0.12);
-  var singleBlockEnd = doubleSpikeEnd + (0.17 - tier * 0.04);
-  var doubleBlockEnd = singleBlockEnd + (0.07 + tier * 0.08);
-  var boostEnd = doubleBlockEnd + 0.08;
+  var cleanChance = 0.24 - tier * 0.10;
+  var singleSpikeEnd = cleanChance + (0.32 - tier * 0.12);
+  var doubleSpikeEnd = singleSpikeEnd + (0.14 + tier * 0.10);
+  var singleBlockEnd = doubleSpikeEnd + (0.16 - tier * 0.06);
+  var doubleBlockEnd = singleBlockEnd + (0.07 + tier * 0.06);
+  var boostEnd = doubleBlockEnd + 0.06;
 
   if (r < cleanChance) {
     width = 12; // regular breathing space
@@ -535,7 +535,7 @@ function makeChunk(bx, diff) {
   } else if (tier > 0.28) {
     // Two distinct beats for experienced runs. Seven clear blocks separate
     // them, and another seven clear blocks follow the second hazard.
-    if (r < boostEnd + tier * 0.12) {
+    if (r < boostEnd + (1 - boostEnd) * 0.5) {
       spike(bx, tier > 0.82 ? 3 : 2);
       block(bx + 10, 1, tier > 0.82 ? 3 : 2, 1);
       width = 10 + (tier > 0.82 ? 3 : 2) + 7;
