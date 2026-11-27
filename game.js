@@ -1725,6 +1725,22 @@ function drawCubeShape(c, skin, s) {
   c.restore();
 }
 
+
+var skinSpriteCache = {};
+function drawSkinSprite(c, skin, size) {
+  var sprite = skinSpriteCache[skin.name];
+  if (!sprite) {
+    sprite = document.createElement('canvas');
+    sprite.width = 96;
+    sprite.height = 96;
+    var spriteCtx = sprite.getContext('2d');
+    spriteCtx.translate(48, 48);
+    drawCubeShape(spriteCtx, skin, 80);
+    skinSpriteCache[skin.name] = sprite;
+  }
+  c.drawImage(sprite, -size / 2, -size / 2, size, size);
+}
+
 function drawPlayerReflection(p, sk) {
   var c1 = hexToRgb(sk.c1);
   var d = clamp(-p.y / (CFG.BLOCK * 6), 0, 1);
@@ -1832,7 +1848,7 @@ function drawPlayer() {
   if (p.mode === 'cube') {
     // Use the exact same cube renderer as the menu skin previews on every device.
     // Low-power mode still disables the expensive glow/shadow above.
-    drawCubeShape(ctx, sk, CFG.BLOCK);
+    drawSkinSprite(ctx, sk, CFG.BLOCK);
   } else {
     drawShip(sk);
   }
@@ -2066,7 +2082,7 @@ function drawMenuPreview() {
   c.rotate(rot);
   c.shadowColor = sk.c1;
   c.shadowBlur = 30;
-  drawCubeShape(c, sk, w * 0.62);
+  drawSkinSprite(c, sk, w * 0.62);
   c.restore();
 }
 
@@ -2159,7 +2175,7 @@ function buildSkinUI() {
       cv.width = 96; cv.height = 96;
       var c2 = cv.getContext('2d');
       c2.translate(48, 48);
-      drawCubeShape(c2, s, 74);
+      drawSkinSprite(c2, s, 74);
       div.appendChild(cv);
       var nameTag = document.createElement('span');
       nameTag.className = 'skin-name';
