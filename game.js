@@ -870,7 +870,7 @@ function buildNoise() {
 
 function resize() {
   // High-DPI canvases multiply the pixels rendered every frame.
-  DPR = Math.min(window.devicePixelRatio || 1, LOW_POWER ? 0.85 : 1.5);
+  DPR = Math.min(window.devicePixelRatio || 1, LOW_POWER ? 0.85 : 1.25);
   var w = canvas.clientWidth || window.innerWidth;
   var h = canvas.clientHeight || window.innerHeight;
   canvas.width = Math.round(w * DPR);
@@ -1503,12 +1503,12 @@ function drawCubeShape(c, skin, s) {
   g.addColorStop(0, skin.c1);
   g.addColorStop(1, skin.c2);
   c.fillStyle = g;
-  roundRect(c, -h, -h, s, s, s * 0.18);
+  roundRect(c, -h, -h, s, s, s * 0.07);
   c.fill();
 
   // top glossy highlight
   c.save();
-  roundRect(c, -h, -h, s, s, s * 0.18);
+  roundRect(c, -h, -h, s, s, s * 0.07);
   c.clip();
   var hl = c.createLinearGradient(0, -h, 0, 0);
   hl.addColorStop(0, 'rgba(255,255,255,0.55)');
@@ -1520,12 +1520,12 @@ function drawCubeShape(c, skin, s) {
   // outer white rim
   c.lineWidth = Math.max(2, s * 0.06);
   c.strokeStyle = '#ffffff';
-  roundRect(c, -h, -h, s, s, s * 0.18);
+  roundRect(c, -h, -h, s, s, s * 0.07);
   c.stroke();
   // inner bevel panel
   c.lineWidth = Math.max(1, s * 0.03);
   c.strokeStyle = 'rgba(0,0,0,0.35)';
-  roundRect(c, -h * 0.72, -h * 0.72, s * 0.72, s * 0.72, s * 0.12);
+  roundRect(c, -h * 0.72, -h * 0.72, s * 0.72, s * 0.72, s * 0.04);
   c.stroke();
 
   var name = skin.name;
