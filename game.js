@@ -83,21 +83,24 @@ loadSave();
 var SKINS = [
   { name: 'CYAN', c1: '#22e6ff', c2: '#0a6b8a', face: 'plain', unlock: 0 },
   { name: 'PINK', c1: '#ff2fb9', c2: '#8a0a5a', face: 'plain', unlock: 0 },
-  { name: 'LIME', c1: '#4dff88', c2: '#0a7a3a', face: 'cross', unlock: 25 },
-  { name: 'GOLD', c1: '#ffe23d', c2: '#8a6a00', face: 'cross', unlock: 50 },
-  { name: 'VIOLET', c1: '#8a4dff', c2: '#3a0a8a', face: 'star', unlock: 75 },
-  { name: 'EMBER', c1: '#ff6a3d', c2: '#8a1a00', face: 'star', unlock: 100 },
-  { name: 'FROST', c1: '#b9f7ff', c2: '#367da8', face: 'diamond', unlock: 125 },
-  { name: 'TOXIC', c1: '#c7ff32', c2: '#477900', face: 'bolt', unlock: 150 },
-  { name: 'PLASMA', c1: '#ff66ed', c2: '#6814a0', face: 'eye', unlock: 175 },
-  { name: 'SOLAR', c1: '#ffad42', c2: '#a52b18', face: 'hex', unlock: 200 },
-  { name: 'GHOST', c1: '#e4eaff', c2: '#6875a8', face: 'target', unlock: 225 },
-  { name: 'VOID', c1: '#9b78ff', c2: '#24104f', face: 'flame', unlock: 250 }
+  { name: 'LIME', c1: '#4dff88', c2: '#0a7a3a', face: 'cross', unlock: 10 },
+  { name: 'GOLD', c1: '#ffe23d', c2: '#8a6a00', face: 'cross', unlock: 18 },
+  { name: 'VIOLET', c1: '#8a4dff', c2: '#3a0a8a', face: 'star', unlock: 26 },
+  { name: 'EMBER', c1: '#ff6a3d', c2: '#8a1a00', face: 'star', unlock: 34 },
+  { name: 'FROST', c1: '#b9f7ff', c2: '#367da8', face: 'diamond', unlock: 42 },
+  { name: 'TOXIC', c1: '#c7ff32', c2: '#477900', face: 'bolt', unlock: 50 },
+  { name: 'PLASMA', c1: '#ff66ed', c2: '#6814a0', face: 'eye', unlock: 60 },
+  { name: 'SOLAR', c1: '#ffad42', c2: '#a52b18', face: 'hex', unlock: 70 },
+  { name: 'GHOST', c1: '#e4eaff', c2: '#6875a8', face: 'target', unlock: 82 },
+  { name: 'VOID', c1: '#9b78ff', c2: '#24104f', face: 'flame', unlock: 95 }
 ];
 function skinUnlocked(i) {
   var s = SKINS[i];
-  return save.bestStage >= s.unlock || save.bestEndless >= s.unlock * 8;
+  return save.bestEndless >= s.unlock;
 }
+// If an older save selected a skin that is no longer earned by its Endless
+// record, fall back to the starter skin instead of displaying a locked skin.
+if (!skinUnlocked(save.skin)) save.skin = 0;
 function currentSkin() { return SKINS[save.skin] || SKINS[0]; }
 
 // ---------- Input ----------
@@ -330,11 +333,11 @@ function buildStage() {
   spike(cx, 1); cx += 8;
   spike(cx, 1); cx += 8;
   // --- Stair section ---
-  block(cx, 1, 1, 1); cx += 5;
-  block(cx, 2, 1, 1); cx += 5;
-  block(cx, 3, 1, 1); cx += 6;
-  block(cx, 2, 1, 1); cx += 5;
-  block(cx, 1, 1, 1); cx += 6;
+  block(cx, 1, 1, 1); cx += 7;
+  block(cx, 2, 1, 1); cx += 7;
+  block(cx, 3, 1, 1); cx += 8;
+  block(cx, 2, 1, 1); cx += 7;
+  block(cx, 1, 1, 1); cx += 8;
   spike(cx, 2); cx += 9;
   block(cx, 1, 3, 1); cx += 9;
   spike(cx, 1); cx += 8;
@@ -345,8 +348,8 @@ function buildStage() {
   block(cx, 1, 2, 1); ring(cx + 4, 4); spike(cx + 5, 1); cx += 11;
   spike(cx, 2); cx += 9;
   // --- Pre-ship run ---
-  block(cx, 1, 1, 1); cx += 5;
-  block(cx, 2, 1, 1); cx += 5;
+  block(cx, 1, 1, 1); cx += 7;
+  block(cx, 2, 1, 1); cx += 7;
   spike(cx, 2); cx += 9;
   shipP(cx); cx += 8;
   // --- Ship flight corridor ---
@@ -372,8 +375,8 @@ function buildStage() {
   block(cx, 1, 2, 1); cx += 8;
   spike(cx, 1); cx += 8;
   pad(cx); ring(cx + 2, 4); spike(cx + 3, 2); cx += 11;
-  block(cx, 2, 1, 1); cx += 5;
-  block(cx, 1, 1, 1); cx += 6;
+  block(cx, 2, 1, 1); cx += 7;
+  block(cx, 1, 1, 1); cx += 8;
   spike(cx, 3); cx += 10;
   spike(cx, 1); cx += 8;
   spike(cx, 2); cx += 9;
@@ -397,47 +400,56 @@ function buildExtraStage(level) {
     1: [
       ['s',1,7],['s',2,9],['b',1,2,1,8],['s',2,9],['b',2,1,2,8],['s',3,11],
       ['p',0,7],['r',4,0,3,8],['s',2,9],['b',1,3,1,9],['s',1,7],['s',3,11],
-      ['p',0,7],['r',5,0,3,9],['b',2,2,2,9],['s',2,9],['s',1,7],['s',2,9]
+      ['p',0,7],['r',5,0,3,9],['b',2,2,2,9],['s',2,9],['s',1,7],['s',2,9],
+      ['n',0,10],['c',1,8,1,1,15],['s',2,10]
     ],
     2: [
       ['s',2,8],['b',1,1,1,6],['s',3,10],['b',2,2,2,8],['s',2,8],['p',0,7],
       ['r',5,0,3,8],['s',3,10],['b',1,3,1,8],['s',2,8],['b',3,1,3,9],
-      ['s',3,10],['p',0,7],['r',5,0,3,8],['s',2,8],['b',2,2,2,8],['s',3,10]
+      ['s',3,10],['p',0,7],['r',5,0,3,8],['s',2,8],['b',2,2,2,8],['s',3,10],
+      ['c',2,9,2,1,17],['n',0,12],['r',4,0,2,10]
     ],
     3: [
       ['s',1,7],['s',2,8],['b',1,2,1,7],['s',3,10],['p',0,7],['r',5,0,3,8],
       ['s',2,8],['b',2,1,2,7],['s',3,10],['b',1,3,1,8],['s',2,8],['p',0,7],
-      ['r',5,0,3,8],['s',3,10],['b',2,2,2,8],['s',3,10],['s',2,8]
+      ['r',5,0,3,8],['s',3,10],['b',2,2,2,8],['s',3,10],['s',2,8],
+      ['n',0,11],['c',1,9,2,1,16],['s',3,12]
     ],
     4: [
       ['s',1,6],['b',1,1,1,6],['s',2,8],['s',1,6],['b',2,2,2,8],['s',2,8],
       ['p',0,7],['r',4,0,2,7],['s',2,8],['b',1,3,1,8],['s',3,10],['b',1,2,1,7],
-      ['p',0,7],['r',5,0,2,8],['s',2,8],['s',3,10],['b',2,1,2,8]
+      ['p',0,7],['r',5,0,2,8],['s',2,8],['s',3,10],['b',2,1,2,8],
+      ['c',1,8,1,2,15],['n',0,12],['r',5,0,2,11]
     ],
     5: [
       ['b',1,1,1,5],['s',2,8],['b',2,1,2,7],['s',1,6],['s',3,10],['p',0,7],
       ['r',5,0,3,8],['b',1,2,1,7],['s',2,8],['b',3,1,3,9],['s',2,8],['p',0,7],
-      ['r',5,0,3,8],['s',3,10],['b',2,2,2,8],['s',2,8],['s',3,10]
+      ['r',5,0,3,8],['s',3,10],['b',2,2,2,8],['s',2,8],['s',3,10],
+      ['n',0,10],['c',2,10,1,1,17],['s',1,9]
     ],
     6: [
       ['s',3,10],['s',1,6],['b',1,3,1,8],['s',2,8],['p',0,7],['r',5,0,3,8],
       ['b',2,1,2,7],['s',3,10],['b',1,2,1,7],['s',2,8],['s',3,10],['p',0,7],
-      ['r',5,0,3,8],['b',3,1,3,9],['s',2,8],['s',3,10],['b',2,2,2,8]
+      ['r',5,0,3,8],['b',3,1,3,9],['s',2,8],['s',3,10],['b',2,2,2,8],
+      ['c',3,10,1,2,18],['n',0,12],['r',5,0,3,11]
     ],
     7: [
       ['s',1,6],['s',2,8],['b',1,1,1,6],['s',3,10],['b',2,2,2,8],['p',0,7],
       ['r',5,0,3,8],['s',2,8],['b',1,3,1,8],['s',3,10],['p',0,7],['r',5,0,3,8],
-      ['s',2,8],['b',2,1,2,7],['s',3,10],['s',2,8],['b',1,2,1,7]
+      ['s',2,8],['b',2,1,2,7],['s',3,10],['s',2,8],['b',1,2,1,7],
+      ['n',0,11],['c',1,8,2,1,16],['s',2,10]
     ],
     8: [
       ['b',1,2,1,7],['s',2,8],['p',0,7],['r',4,0,3,8],['s',3,10],['b',2,3,2,9],
       ['s',2,8],['b',1,1,1,6],['s',3,10],['p',0,7],['r',5,0,3,8],['s',2,8],
-      ['b',3,1,3,9],['s',3,10],['b',1,2,1,7],['s',2,8],['s',3,10]
+      ['b',3,1,3,9],['s',3,10],['b',1,2,1,7],['s',2,8],['s',3,10],
+      ['c',2,9,1,2,17],['n',0,12],['r',4,0,3,11]
     ],
     9: [
       ['s',2,8],['b',1,2,1,7],['s',3,10],['p',0,7],['r',5,0,3,8],['b',2,2,2,8],
       ['s',2,8],['s',3,10],['b',1,3,1,8],['p',0,7],['r',5,0,3,8],['s',3,10],
-      ['b',2,1,2,7],['s',2,8],['b',1,2,1,7],['s',3,10],['s',2,8]
+      ['b',2,1,2,7],['s',2,8],['b',1,2,1,7],['s',3,10],['s',2,8],
+      ['n',0,12],['c',2,10,2,1,18],['s',3,12]
     ]
   };
   var patterns = patternsByLevel[level] || patternsByLevel[1];
@@ -447,13 +459,20 @@ function buildExtraStage(level) {
     else if (p[0] === 'b') block(cx, p[1], p[2], p[3]);
     else if (p[0] === 'p') pad(cx);
     else if (p[0] === 'r') { ring(cx + 2, p[1]); spike(cx + 3, p[3]); }
-    // Keep at least five clear blocks after the last solid hazard in
-    // every pattern. This gives players time to land and jump again.
-    var hazardEnd = 1;
+    // Multi-beat patterns are separated by a full landing-and-reset window.
+    // The second obstacle is deliberately far enough away for a fresh jump.
+    if (p[0] === 'c') {
+      spike(cx, p[1]);
+      block(cx + p[2], p[3], p[4], 1);
+    }
+    // Rest patterns create a deliberate rhythm break without extra hazards.
+    var hazardEnd = 0;
     if (p[0] === 's') hazardEnd = p[1];
     else if (p[0] === 'b') hazardEnd = p[2];
     else if (p[0] === 'r') hazardEnd = 3 + p[3];
-    cx += Math.max(w, hazardEnd + 5);
+    else if (p[0] === 'c') hazardEnd = p[2] + p[4];
+    // Seven completely clear blocks after the final hazard.
+    cx += Math.max(w, hazardEnd + 7);
   }
   // Flight sections give selected courses a different feel.
   var shipStart = 0;
@@ -2315,7 +2334,7 @@ function buildSkinUI() {
       var unlocked = skinUnlocked(i);
       var div = document.createElement('div');
       div.className = 'skin' + (i === save.skin ? ' selected' : '') + (unlocked ? '' : ' locked');
-      var lockText = s.unlock <= 100 ? s.unlock + '%' : 'ENDLESS ' + (s.unlock * 8) + 'm';
+      var lockText = 'ENDLESS ' + s.unlock + 'm';
       if (!unlocked) div.setAttribute('data-lock', lockText);
       div.setAttribute('title', s.name + (unlocked ? '' : ' · Unlock: ' + lockText));
       div.setAttribute('aria-label', s.name + (unlocked ? ' skin' : ' locked'));
