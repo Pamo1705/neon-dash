@@ -4,9 +4,9 @@
 
 # ⚡ NEON DASH ⚡
 
-### **High-Speed Rhythm-Action Neon Gauntlet**
+### **A Fast-Paced Neon Rhythm Platformer**
 
-*Jump, fly, and dash in sync with a pulsing synthwave soundtrack across desktop and mobile — zero downloads, instant play.*
+*Jump, fly, and dodge your way through a neon-soaked obstacle course, powered by an energetic synthwave soundtrack. Play instantly in your browser on desktop, mobile, or tablet — no downloads required.*
 
 <br/>
 
@@ -24,21 +24,21 @@
   <tr>
     <td width="50%" valign="top">
       <h3>🎵 STEREO PULSE</h3>
-      <p>A hand-crafted 60-second gauntlet engineered around the beat — escalating through spike combos, jump pads, mid-air boost rings, and dynamic color-shift zones.</p>
+      <p>Take on a handcrafted rhythm-based level packed with spikes, blocks, jump pads, boost rings, and carefully timed obstacle sequences. Learn the patterns, find your rhythm, and reach the finish.</p>
     </td>
     <td width="50%" valign="top">
       <h3>🚀 Cube & Ship Transformation</h3>
-      <p>Pass through vortex portals mid-run to switch seamlessly between razor-sharp cube platforming and jetpack flight physics.</p>
+      <p>Fly through transformation portals and switch between precise cube platforming and ship flight. Each mode brings its own movement, timing, and challenges.</p>
     </td>
   </tr>
   <tr>
     <td width="50%" valign="top">
       <h3>∞ Endless & Practice Modes</h3>
-      <p>Chase high scores in an infinitely escalating procedural run, or master difficult sequences with automatic checkpoints in Practice Mode.</p>
+      <p>Push your distance record in an endless run where the challenge builds smoothly as you travel farther. Take on ten handcrafted levels with steadily rising difficulty, or use Practice Mode and its automatic checkpoints to master tricky sections.</p>
     </td>
     <td width="50%" valign="top">
-      <h3>⚡ Zero-Downtime Flow</h3>
-      <p>Instant 0.35s respawns after every crash with zero pop-up interruptions, plus unlockable neon cube skins saved automatically in your browser.</p>
+      <h3>⚡ Fast Restarts & Unlockable Skins</h3>
+      <p>Get straight back into the action with quick respawns after a crash. Set new records, unlock a collection of neon cube skins through Endless milestones, and keep your progress saved in your browser.</p>
     </td>
   </tr>
 </table>
