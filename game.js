@@ -1735,7 +1735,7 @@ function drawSkinSprite(c, skin, size) {
     sprite.height = 96;
     var spriteCtx = sprite.getContext('2d');
     spriteCtx.translate(48, 48);
-    drawCubeShape(spriteCtx, skin, 80);
+    drawCubeShape(spriteCtx, skin, 96);
     skinSpriteCache[skin.name] = sprite;
   }
   c.drawImage(sprite, -size / 2, -size / 2, size, size);
@@ -1840,9 +1840,8 @@ function drawPlayer() {
   ctx.save();
   ctx.translate(p.x, p.y);
   ctx.rotate(p.rot);
-  var sq = p.squash || 0;
-  var stretch = (!p.onGround && p.mode === 'cube') ? clamp(Math.abs(p.vy) / CFG.MAX_FALL, 0, 1) * 0.18 : 0;
-  ctx.scale(1 + sq * 0.25 - stretch * 0.5, 1 - sq * 0.25 + stretch);
+  // Keep the cube's proportions identical to the skin-changer tile.
+  // Rotation is retained for gameplay, but the skin artwork is never squashed or stretched.
   ctx.shadowColor = sk.c1;
   ctx.shadowBlur = LOW_POWER ? 0 : 22;
   if (p.mode === 'cube') {
