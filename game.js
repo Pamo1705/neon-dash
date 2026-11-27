@@ -452,7 +452,12 @@ function buildExtraStage(level) {
       ['n',0,12],['c',2,10,2,1,18],['s',3,12]
     ]
   };
-  var patterns = patternsByLevel[level] || patternsByLevel[1];
+  // Keep the ten courses in a deliberate difficulty order. The extra-stage
+  // pattern sets are ranked by obstacle density, spacing, and multi-part beats.
+  // This changes only which fixed course is selected; difficulty never scales
+  // while a level is being played.
+  var patternOrder = [0, 1, 4, 5, 8, 6, 9, 2, 7, 3];
+  var patterns = patternsByLevel[patternOrder[level] || 1];
   for (var i = 0; i < patterns.length; i++) {
     var p = patterns[i], w = p[p.length - 1];
     if (p[0] === 's') spike(cx, p[1]);
@@ -506,12 +511,16 @@ function makeChunk(bx, diff) {
   // toughest setting. Every chunk still has a clear recovery runway.
   var tier = clamp(diff, 0, 1);
   var r = Math.random(), width = 12;
+  // Linear progression means each 50m adds another 10% of the full
+  // difficulty range. All probabilities move continuously between milestones.
   var cleanChance = 0.24 - tier * 0.10;
   var singleSpikeEnd = cleanChance + (0.32 - tier * 0.12);
   var doubleSpikeEnd = singleSpikeEnd + (0.14 + tier * 0.10);
   var singleBlockEnd = doubleSpikeEnd + (0.16 - tier * 0.06);
   var doubleBlockEnd = singleBlockEnd + (0.07 + tier * 0.06);
   var boostEnd = doubleBlockEnd + 0.06;
+  var threeWideChance = 0.04 + tier * 0.42;
+  var wideObstacle = Math.random() < threeWideChance ? 3 : 2;
 
   if (r < cleanChance) {
     width = 12; // regular breathing space
@@ -519,35 +528,32 @@ function makeChunk(bx, diff) {
     spike(bx, 1);
     width = 12;
   } else if (r < doubleSpikeEnd) {
-    spike(bx, tier > 0.72 && r > singleSpikeEnd + (doubleSpikeEnd - singleSpikeEnd) * 0.72 ? 3 : 2);
+    spike(bx, Math.random() < threeWideChance ? 3 : 2);
     width = 14;
   } else if (r < singleBlockEnd) {
     block(bx, 1, 1, 1);
     width = 12;
   } else if (r < doubleBlockEnd) {
-    block(bx, 1, tier > 0.7 ? 3 : 2, 1);
-    width = tier > 0.7 ? 14 : 13;
+    block(bx, 1, wideObstacle, 1);
+    width = wideObstacle === 3 ? 14 : 13;
   } else if (r < boostEnd) {
     // The boost is optional; the ring is never required to survive.
     pad(bx);
     ring(bx + 2, 4);
     width = 14;
-  } else if (tier > 0.28) {
-    // Two distinct beats for experienced runs. Seven clear blocks separate
-    // them, and another seven clear blocks follow the second hazard.
-    if (r < boostEnd + (1 - boostEnd) * 0.5) {
-      spike(bx, tier > 0.82 ? 3 : 2);
-      block(bx + 10, 1, tier > 0.82 ? 3 : 2, 1);
-      width = 10 + (tier > 0.82 ? 3 : 2) + 7;
-    } else {
-      block(bx, 1, tier > 0.82 ? 3 : 2, 1);
-      spike(bx + 10, tier > 0.82 ? 3 : 2);
-      width = 10 + (tier > 0.82 ? 3 : 2) + 7;
-    }
   } else {
-    // Early runs remain approachable: a single, readable obstacle.
-    spike(bx, 1);
-    width = 12;
+    // Two distinct beats. The spacing stays readable while their width
+    // gradually increases with distance instead of changing at a hard tier.
+    var comboWidth = Math.random() < threeWideChance ? 3 : 2;
+    if (Math.random() < 0.5) {
+      spike(bx, comboWidth);
+      block(bx + 10, 1, comboWidth, 1);
+    } else {
+      block(bx, 1, comboWidth, 1);
+      spike(bx + 10, comboWidth);
+    }
+    // Seven clear blocks separate the beats and follow the final hazard.
+    width = 10 + comboWidth + 7;
   }
 
   return { ents: ents, width: width };
@@ -650,8 +656,12 @@ var Game = {
     var ahead = player.x + Math.max(1800, this.viewW + 900);
     var guard = 0;
     while (this.genBlock * CFG.BLOCK < ahead && guard < 40) {
-      // 44px blocks convert to about 0.88m each; reach full difficulty near 500m.
-      var diff = clamp(this.genBlock / 568, 0, 1);
+      // Evaluate difficulty at the next chunk's world position. 44px is
+      // about 0.88m, so the curve rises smoothly by 10% every 50m and tops
+      // out at 500m. Pre-generated obstacles therefore match their actual
+      // difficulty when the player reaches them.
+      var chunkMeters = this.genBlock * CFG.BLOCK / 50;
+      var diff = clamp(chunkMeters / 500, 0, 1);
       var c = makeChunk(this.genBlock, diff);
       for (var i = 0; i < c.ents.length; i++) this.ents.push(c.ents[i]);
       this.genBlock += c.width;
