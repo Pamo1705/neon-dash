@@ -456,7 +456,7 @@ function buildExtraStage(level) {
   // pattern sets are ranked by obstacle density, spacing, and multi-part beats.
   // This changes only which fixed course is selected; difficulty never scales
   // while a level is being played.
-  var patternOrder = [0, 1, 4, 5, 8, 6, 9, 2, 7, 3];
+  var patternOrder = [0, 1, 3, 4, 7, 5, 9, 2, 8, 6];
   var patterns = patternsByLevel[patternOrder[level] || 1];
   for (var i = 0; i < patterns.length; i++) {
     var p = patterns[i], w = p[p.length - 1];
