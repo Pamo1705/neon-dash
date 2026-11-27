@@ -283,14 +283,18 @@ function burst(x, y, n, color, spd, life, size) {
   }
 }
 function updateParticles(dt) {
+  // Swap-remove expired particles instead of shifting the whole array with splice().
   for (var i = particles.length - 1; i >= 0; i--) {
     var p = particles[i];
     p.life -= dt;
-    if (p.life <= 0) { particles.splice(i, 1); continue; }
+    if (p.life <= 0) {
+      particles[i] = particles[particles.length - 1];
+      particles.pop();
+      continue;
+    }
     p.vy += (p.g || 0) * dt;
     p.x += p.vx * dt;
     p.y += p.vy * dt;
-    if (p.type === 'line') { p.vx += 0; }
   }
 }
 
@@ -432,6 +436,8 @@ var player = {
 };
 
 // ---------- Game ----------
+var hudPctCache = '', hudWidthCache = '', hudAttemptCache = '';
+
 var Game = {
   state: 'menu', mode: 'stage', ents: [], endX: 1, startX: 0, shipStart: 0,
   speedMul: 1, attempt: 0, progress: 0, maxProgress: 0,
@@ -602,15 +608,23 @@ var Game = {
   },
 
   updateHud: function () {
+    var pctText, widthText;
     if (this.mode === 'stage') {
-      elProgressFill.style.width = (this.progress * 100) + '%';
-      elPct.textContent = Math.floor(this.progress * 100) + '%';
+      var stagePct = Math.floor(this.progress * 100);
+      pctText = stagePct + '%';
+      widthText = stagePct + '%';
     } else {
-      var chunk = (player.x - this.startX) % 2200;
-      elProgressFill.style.width = (chunk / 2200 * 100) + '%';
-      elPct.textContent = Math.floor((player.x - this.startX) / 50) + 'm';
+      var distance = player.x - this.startX;
+      var chunk = distance % 2200;
+      var endlessPct = Math.floor(chunk / 2200 * 100);
+      widthText = endlessPct + '%';
+      pctText = Math.floor(distance / 50) + 'm';
     }
-    elAttempt.textContent = 'Attempt ' + this.attempt + (this.practice ? '  \u00B7  PRACTICE' : '');
+    var attemptText = 'Attempt ' + this.attempt + (this.practice ? '  \u00B7  PRACTICE' : '');
+    // Avoid forcing DOM/style work on every 120 Hz physics tick.
+    if (pctText !== hudPctCache) { elPct.textContent = pctText; hudPctCache = pctText; }
+    if (widthText !== hudWidthCache) { elProgressFill.style.width = widthText; hudWidthCache = widthText; }
+    if (attemptText !== hudAttemptCache) { elAttempt.textContent = attemptText; hudAttemptCache = attemptText; }
   },
 
   refreshMenu: function () {
@@ -716,6 +730,18 @@ function updatePlaying(dt, pressed) {
   Game.updateHud();
 }
 
+function firstEntityAt(minX) {
+  // Entity arrays are generated in increasing x order; binary search skips
+  // everything well behind the player/camera instead of rescanning it.
+  var lo = 0, hi = Game.ents.length;
+  while (lo < hi) {
+    var mid = (lo + hi) >>> 1;
+    if (Game.ents[mid].x < minX) lo = mid + 1;
+    else hi = mid;
+  }
+  return lo;
+}
+
 function handleWorld(p, pressed, dt) {
   var B = CFG.BLOCK, half = HALF;
   var minX = p.x - 320, maxX = p.x + 1100;
@@ -723,7 +749,7 @@ function handleWorld(p, pressed, dt) {
   var pleft = p.x - half + inset, ptop = p.y - half + inset, pwid = B - inset * 2, phei = B - inset * 2;
   var i, e;
 
-  for (i = 0; i < Game.ents.length; i++) {
+  for (i = firstEntityAt(minX - 400); i < Game.ents.length; i++) {
     e = Game.ents[i];
     if (e.x > maxX) break;
     if (e.type === 'block') {
@@ -1730,8 +1756,10 @@ function drawParticles() {
   // additive pass (sparks, embers, lines, fireworks)
   ctx.save();
   ctx.globalCompositeOperation = 'lighter';
+  var viewLeft = Game.camX - 120, viewRight = Game.camX + viewW + 120;
   for (i = 0; i < particles.length; i++) {
     p = particles[i];
+    if (p.x < viewLeft || p.x > viewRight || (LOW_POWER && p.type === 'smoke')) continue;
     if (p.type === 'smoke') continue;
     a = clamp(p.life / p.max, 0, 1);
     if (p.type === 'line') {
@@ -1764,9 +1792,9 @@ function drawParticles() {
   ctx.restore();
 
   // smoke pass (soft, normal blend)
-  for (i = 0; i < particles.length; i++) {
+  if (!LOW_POWER) for (i = 0; i < particles.length; i++) {
     p = particles[i];
-    if (p.type !== 'smoke') continue;
+    if (p.type !== 'smoke' || p.x < viewLeft || p.x > viewRight) continue;
     a = clamp(p.life / p.max, 0, 1);
     var rr = p.size * (1.4 - a * 0.6);
     var g = ctx.createRadialGradient(p.x, p.y, 1, p.x, p.y, rr);
@@ -1913,13 +1941,13 @@ function render() {
   drawCheckpoint();
 
   var left = Game.camX - 200, right = Game.camX + viewW + 400;
-  var i, e;
-  for (i = 0; i < Game.ents.length; i++) {
+  var i, e, firstVisible = firstEntityAt(left - 400);
+  for (i = firstVisible; i < Game.ents.length; i++) {
     e = Game.ents[i];
     if (e.x > right) break;
     if (e.type === 'block') { if (e.x + e.w < left) continue; drawBlock(e); }
   }
-  for (i = 0; i < Game.ents.length; i++) {
+  for (i = firstVisible; i < Game.ents.length; i++) {
     e = Game.ents[i];
     if (e.x > right) break;
     if (e.x + (e.w || CFG.BLOCK) < left) continue;
@@ -2018,6 +2046,10 @@ function wireUI() {
 function boot() {
   resize();
   Input.init();
+  document.addEventListener('visibilitychange', function () {
+    if (document.hidden && Game.state === 'playing') Game.pause();
+    lastT = 0; lastRenderT = 0; lastDraw = 0; acc = 0;
+  });
   wireUI();
   elPractice.checked = !!save.practice;
   updateSoundIcon();
