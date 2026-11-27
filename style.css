@@ -593,3 +593,175 @@ html, body {
   .title, .skin-stage-glow, #progressFill, .victory-card { animation: none !important; }
   .big-btn, .skin, .icon-btn { transition: none !important; }
 }
+
+
+/* ---------- Device-adaptive menu layout ---------- */
+/* Use the actual visible mobile viewport, including browser chrome and notches. */
+html, body, #app {
+  min-height: 0;
+  height: 100%;
+}
+#app {
+  height: 100vh;
+  height: 100dvh;
+}
+.overlay {
+  min-height: 0;
+  padding:
+    max(12px, env(safe-area-inset-top))
+    max(12px, env(safe-area-inset-right))
+    max(12px, env(safe-area-inset-bottom))
+    max(12px, env(safe-area-inset-left));
+  overflow: auto;
+  overscroll-behavior: contain;
+  touch-action: pan-y;
+}
+#menu {
+  align-items: center;
+  justify-content: center;
+}
+.menu-inner {
+  width: min(680px, 100%);
+  max-width: 100%;
+  max-height: calc(100vh - 24px);
+  max-height: calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 24px);
+  min-height: 0;
+  flex: 0 1 auto;
+  gap: clamp(8px, 1.8vh, 16px);
+  padding: clamp(6px, 1.5vh, 12px) clamp(4px, 1.5vw, 10px);
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+.brand { max-width: 100%; gap: clamp(4px, 0.9vh, 8px); }
+.title {
+  max-width: 100%;
+  font-size: clamp(30px, min(10vw, 8vh), 78px);
+  letter-spacing: clamp(1px, 1vw, 6px);
+  overflow-wrap: anywhere;
+}
+.menu-kicker {
+  max-width: 100%;
+  font-size: clamp(8px, 1.6vw, 10px);
+  letter-spacing: clamp(1px, 0.55vw, 4px);
+}
+.menu-edition {
+  font-size: clamp(8px, 1.5vw, 9px);
+  letter-spacing: clamp(1px, 0.4vw, 2.5px);
+}
+.mode-card, .panel, .menu-foot {
+  width: 100%;
+  min-width: 0;
+}
+.mode-card { padding: clamp(8px, 1.8vw, 16px); }
+.mode-row { min-width: 0; gap: clamp(7px, 1.5vw, 14px); }
+.big-btn {
+  min-width: 0;
+  flex: 1 1 0;
+  width: 100%;
+  padding: clamp(10px, 1.8vh, 16px) clamp(8px, 2vw, 22px);
+}
+.btn-title {
+  font-size: clamp(13px, 2.7vw, 22px);
+  letter-spacing: clamp(0.5px, 0.4vw, 2px);
+}
+.btn-sub {
+  font-size: clamp(9px, 1.5vw, 11px);
+  letter-spacing: clamp(0px, 0.2vw, 1px);
+}
+.panel { padding: clamp(9px, 1.8vw, 16px); }
+.panel-head {
+  font-size: clamp(10px, 1.7vw, 12px);
+  letter-spacing: clamp(1px, 0.45vw, 3px);
+}
+.skin-stage {
+  height: clamp(76px, 17vh, 150px);
+  margin-bottom: clamp(6px, 1.5vh, 14px);
+}
+#skinPreview {
+  width: min( clamp(76px, 17vh, 150px), 42vw);
+  height: min( clamp(76px, 17vh, 150px), 42vw);
+}
+.skins {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 68px), 1fr));
+  gap: clamp(5px, 1.2vw, 10px);
+}
+.skin {
+  min-width: 0;
+  min-height: 0;
+  aspect-ratio: 1 / 1;
+}
+.skin-name {
+  font-size: clamp(7px, 1.35vw, 9px);
+  letter-spacing: clamp(0px, 0.2vw, 1px);
+}
+.menu-foot {
+  padding: clamp(9px, 1.8vw, 14px);
+  gap: 8px;
+}
+.practice-row {
+  min-width: 0;
+  flex-wrap: wrap;
+  font-size: clamp(10px, 1.8vw, 13px);
+}
+.best-stats {
+  min-width: 0;
+  font-size: clamp(9px, 1.6vw, 12px);
+}
+.controls-hint {
+  max-width: 100%;
+  gap: 6px clamp(8px, 1.6vw, 16px);
+  padding: 8px 10px;
+  font-size: clamp(8px, 1.4vw, 11px);
+}
+.pause-inner {
+  width: min(560px, 100%);
+  max-width: 100%;
+  padding: clamp(16px, 4vw, 28px);
+}
+.pause-inner .mode-row { flex-wrap: wrap; }
+.pause-inner .big-btn { flex: 1 1 130px; }
+
+/* Narrow phones: stack the game modes and keep skin tiles comfortably tappable. */
+@media (max-width: 420px) {
+  .menu-inner { width: 100%; }
+  .mode-row { flex-direction: column; }
+  .mode-row .big-btn { flex: 0 0 auto; max-width: none; }
+  .mode-card { padding: 8px; }
+  .skins { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .skin { min-height: 72px; }
+  .skin canvas { width: 68%; height: 68%; }
+  .menu-foot { align-items: flex-start; flex-direction: column; }
+  .controls-hint { display: none; }
+}
+
+/* Short landscape phones and compact laptop windows. */
+@media (max-height: 520px) {
+  .overlay { padding-top: max(6px, env(safe-area-inset-top)); padding-bottom: max(6px, env(safe-area-inset-bottom)); }
+  .menu-inner {
+    max-height: calc(100vh - 12px);
+    max-height: calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 12px);
+    gap: 6px;
+    padding-top: 4px;
+    padding-bottom: 6px;
+  }
+  .brand { gap: 3px; }
+  .title { font-size: clamp(25px, 7vh, 42px); }
+  .tagline, .menu-kicker, .menu-edition, .controls-hint { display: none; }
+  .mode-card { padding: 7px; }
+  .big-btn { padding: 7px 10px; }
+  .skin-stage { height: 62px; margin-bottom: 5px; }
+  #skinPreview { width: 62px; height: 62px; }
+  .panel { padding: 7px 9px; }
+  .panel-head { margin-bottom: 5px; }
+  .skins { grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 5px; }
+  .skin { min-height: 54px; }
+  .menu-foot { padding: 7px 9px; }
+}
+
+/* Extra-wide displays should not stretch the menu beyond a readable width. */
+@media (min-width: 900px) {
+  .menu-inner { width: min(720px, 94vw); }
+}
+@supports (height: 100svh) {
+  #app { min-height: 100svh; }
+}
