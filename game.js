@@ -272,7 +272,7 @@ function updateSoundIcon() {
 // ---------- Particles ----------
 var particles = [];
 function spawnParticle(p) {
-  var particleLimit = LOW_POWER ? 65 : 240;
+  var particleLimit = LOW_POWER ? 80 : 240;
   if (particles.length >= particleLimit) return;
   particles.push(p);
 }
@@ -896,7 +896,7 @@ function buildNoise() {
 
 function resize() {
   // High-DPI canvases multiply the pixels rendered every frame.
-  DPR = Math.min(window.devicePixelRatio || 1, LOW_POWER ? 0.75 : 1.25);
+  DPR = Math.min(window.devicePixelRatio || 1, LOW_POWER ? 0.85 : 1.5);
   var w = canvas.clientWidth || window.innerWidth;
   var h = canvas.clientHeight || window.innerHeight;
   canvas.width = Math.round(w * DPR);
@@ -925,15 +925,22 @@ function drawBackground() {
   var groundCss = (-Game.camY) * S;
 
   if (LOW_POWER) {
-    // Minimal backdrop: avoid animated radial gradients and per-star drawing.
-    ctx.fillStyle = rgb(pal.sky2);
+    // Lightweight layered sky: more depth without the costly nebula effects.
+    var lowSky = ctx.createLinearGradient(0, 0, 0, h);
+    lowSky.addColorStop(0, rgb(pal.sky0));
+    lowSky.addColorStop(0.62, rgb(pal.sky2));
+    lowSky.addColorStop(1, rgb(pal.floor));
+    ctx.fillStyle = lowSky;
     ctx.fillRect(0, 0, w, h);
-    ctx.fillStyle = rgb(pal.sky0, 0.55);
-    ctx.fillRect(0, 0, w, Math.max(0, groundCss));
-    ctx.fillStyle = rgb(pal.floor, 0.95);
+    drawStars(w, h, groundCss, pal, 0);
+    ctx.fillStyle = rgb(mix(pal.floor, pal.sky2, 0.28), 0.96);
     ctx.fillRect(0, groundCss, w, Math.max(0, h - groundCss));
-    ctx.fillStyle = rgb(pal.grid, 0.7);
+    ctx.fillStyle = rgb(pal.grid, 0.22);
+    ctx.fillRect(0, groundCss + 5, w, 2);
+    ctx.fillStyle = rgb(pal.accent, 0.5);
     ctx.fillRect(0, groundCss, w, 2);
+    ctx.fillStyle = rgb(pal.grid, 0.16);
+    ctx.fillRect(0, groundCss + 18, w, 1);
     return;
   }
 
@@ -1198,9 +1205,17 @@ function drawBlock(e) {
     var lowPal = currentPalette();
     ctx.fillStyle = rgb(mix(lowPal.floor, lowPal.grid, 0.22), 0.98);
     ctx.fillRect(e.x + 2, e.y + 2, e.w - 4, e.h - 4);
-    ctx.strokeStyle = rgb(lowPal.grid, 0.85);
+    ctx.fillStyle = rgb(lowPal.grid, 0.2);
+    ctx.fillRect(e.x + 4, e.y + 4, e.w - 8, Math.min(4, e.h - 8));
+    ctx.strokeStyle = rgb(lowPal.grid, 0.9);
     ctx.lineWidth = 2;
     ctx.strokeRect(e.x + 2, e.y + 2, e.w - 4, e.h - 4);
+    ctx.strokeStyle = rgb(lowPal.accent, 0.45);
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(e.x + 5, e.y + e.h - 5);
+    ctx.lineTo(e.x + e.w - 5, e.y + e.h - 5);
+    ctx.stroke();
     return;
   }
   var beat = Audio.getBeat();
@@ -1272,11 +1287,20 @@ function drawSpike(e) {
   if (LOW_POWER) {
     var lowPal = currentPalette();
     ctx.fillStyle = '#32172b';
-    ctx.strokeStyle = rgb(lowPal.accent, 0.9);
-    ctx.lineWidth = 2;
     ctx.beginPath();
     ctx.moveTo(e.x, e.baseY); ctx.lineTo(e.x + e.w, e.baseY); ctx.lineTo(e.x + e.w / 2, e.baseY - e.h);
-    ctx.closePath(); ctx.fill(); ctx.stroke();
+    ctx.closePath(); ctx.fill();
+    ctx.fillStyle = 'rgba(255,255,255,0.12)';
+    ctx.beginPath();
+    ctx.moveTo(e.x + e.w * 0.18, e.baseY - 3);
+    ctx.lineTo(e.x + e.w * 0.5, e.baseY - e.h * 0.72);
+    ctx.lineTo(e.x + e.w * 0.82, e.baseY - 3);
+    ctx.closePath(); ctx.fill();
+    ctx.strokeStyle = rgb(lowPal.accent, 0.95);
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(e.x, e.baseY); ctx.lineTo(e.x + e.w / 2, e.baseY - e.h); ctx.lineTo(e.x + e.w, e.baseY);
+    ctx.stroke();
     return;
   }
   var beat = Audio.getBeat();
@@ -1970,7 +1994,7 @@ function render() {
 }
 
 // ---------- Loop ----------
-var lastT = 0, acc = 0, lastDraw = 0;
+var lastT = 0, acc = 0;
 function frame(now) {
   if (!lastT) lastT = now;
   var dt = (now - lastT) / 1000;
@@ -1993,11 +2017,8 @@ function frame(now) {
     Input.consumePress();
     update(dt, false);
   }
-  // Render at up to 60 FPS on every device; fixed-step physics stays independent.
-  if (now - lastDraw >= 1000 / 60) {
-    render();
-    lastDraw = now;
-  }
+  // Render on every display refresh; fixed-step physics remains independent.
+  render();
   requestAnimationFrame(frame);
 }
 
@@ -2048,7 +2069,7 @@ function boot() {
   Input.init();
   document.addEventListener('visibilitychange', function () {
     if (document.hidden && Game.state === 'playing') Game.pause();
-    lastT = 0; lastRenderT = 0; lastDraw = 0; acc = 0;
+    lastT = 0; lastRenderT = 0; acc = 0;
   });
   wireUI();
   elPractice.checked = !!save.practice;
