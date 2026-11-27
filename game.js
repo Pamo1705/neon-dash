@@ -86,7 +86,13 @@ var SKINS = [
   { name: 'LIME', c1: '#4dff88', c2: '#0a7a3a', face: 'cross', unlock: 25 },
   { name: 'GOLD', c1: '#ffe23d', c2: '#8a6a00', face: 'cross', unlock: 50 },
   { name: 'VIOLET', c1: '#8a4dff', c2: '#3a0a8a', face: 'star', unlock: 75 },
-  { name: 'EMBER', c1: '#ff6a3d', c2: '#8a1a00', face: 'star', unlock: 100 }
+  { name: 'EMBER', c1: '#ff6a3d', c2: '#8a1a00', face: 'star', unlock: 100 },
+  { name: 'FROST', c1: '#b9f7ff', c2: '#367da8', face: 'diamond', unlock: 125 },
+  { name: 'TOXIC', c1: '#c7ff32', c2: '#477900', face: 'bolt', unlock: 150 },
+  { name: 'PLASMA', c1: '#ff66ed', c2: '#6814a0', face: 'eye', unlock: 175 },
+  { name: 'SOLAR', c1: '#ffad42', c2: '#a52b18', face: 'hex', unlock: 200 },
+  { name: 'GHOST', c1: '#e4eaff', c2: '#6875a8', face: 'target', unlock: 225 },
+  { name: 'VOID', c1: '#9b78ff', c2: '#24104f', face: 'flame', unlock: 250 }
 ];
 function skinUnlocked(i) {
   var s = SKINS[i];
@@ -964,6 +970,28 @@ function drawBackground() {
         }
       }
     }
+    // A second, quieter silhouette and horizon tracers create extra depth at almost no cost.
+    var farBase = skylineBase - 18 * S;
+    var farScroll = (Game.camX * 0.045 * S) % 210;
+    ctx.fillStyle = rgb(mix(pal.sky0, pal.sky2, 0.42), 0.42);
+    for (var fi = -1; fi < Math.ceil(w / 210) + 1; fi++) {
+      var fx = fi * 210 - farScroll;
+      var fh = (55 + hash(fi * 9.1 + 17) * 70) * S;
+      ctx.fillRect(fx, farBase - fh, (72 + hash(fi * 4.2 + 5) * 65) * S, fh);
+    }
+    ctx.fillStyle = rgb(pal.accent, 0.14);
+    ctx.fillRect(0, groundCss - 34 * S, w, Math.max(1, S));
+    ctx.fillStyle = rgb(pal.grid, 0.12);
+    ctx.fillRect(0, groundCss - 30 * S, w, Math.max(1, S));
+    // Sparse floating markers, drawn as short line segments rather than effects.
+    ctx.strokeStyle = rgb(pal.accent, 0.22);
+    ctx.lineWidth = Math.max(1, S);
+    for (var mi = 0; mi < 4; mi++) {
+      var mx = ((mi * 173 + Game.camX * 0.07) % (w + 80)) - 40;
+      var my = groundCss - (105 + (mi % 2) * 62) * S;
+      ctx.strokeRect(mx, my, 9 * S, 9 * S);
+      ctx.beginPath(); ctx.moveTo(mx - 5 * S, my + 4 * S); ctx.lineTo(mx + 14 * S, my + 4 * S); ctx.stroke();
+    }
     return;
   }
 
@@ -1651,8 +1679,7 @@ function drawCubeShape(c, skin, s) {
       c.fillRect(-s * 0.05, -s * 0.32, s * 0.1, s * 0.64);
     }
     c.restore();
-  } else {
-    // star faces
+  } else if (skin.face === 'star') {
     c.beginPath();
     for (var i = 0; i < 10; i++) {
       var ang = -Math.PI / 2 + i * Math.PI / 5;
@@ -1662,14 +1689,36 @@ function drawCubeShape(c, skin, s) {
     }
     c.closePath(); c.fill();
     if (name === 'EMBER') {
-      // inner flame
       c.fillStyle = 'rgba(255,220,120,0.9)';
-      c.beginPath();
-      c.moveTo(0, -s * 0.16);
+      c.beginPath(); c.moveTo(0, -s * 0.16);
       c.quadraticCurveTo(s * 0.12, 0, 0, s * 0.16);
-      c.quadraticCurveTo(-s * 0.12, 0, 0, -s * 0.16);
-      c.fill();
+      c.quadraticCurveTo(-s * 0.12, 0, 0, -s * 0.16); c.fill();
     }
+  } else if (skin.face === 'diamond') {
+    c.beginPath(); c.moveTo(0, -s * 0.34); c.lineTo(s * 0.27, 0);
+    c.lineTo(0, s * 0.34); c.lineTo(-s * 0.27, 0); c.closePath(); c.fill();
+    c.fillStyle = 'rgba(255,255,255,0.8)';
+    c.fillRect(-s * 0.035, -s * 0.2, s * 0.07, s * 0.4);
+  } else if (skin.face === 'bolt') {
+    c.beginPath(); c.moveTo(s * 0.06, -s * 0.36); c.lineTo(-s * 0.22, s * 0.02);
+    c.lineTo(-s * 0.02, s * 0.02); c.lineTo(-s * 0.08, s * 0.36);
+    c.lineTo(s * 0.24, -s * 0.08); c.lineTo(s * 0.04, -s * 0.08); c.closePath(); c.fill();
+  } else if (skin.face === 'eye') {
+    c.beginPath(); c.ellipse(0, 0, s * 0.34, s * 0.19, 0, 0, Math.PI * 2); c.fill();
+    c.fillStyle = skin.c1; c.beginPath(); c.arc(0, 0, s * 0.12, 0, Math.PI * 2); c.fill();
+  } else if (skin.face === 'hex') {
+    c.beginPath();
+    for (var hx = 0; hx < 6; hx++) { var ha = hx * Math.PI / 3; var hpx = Math.cos(ha) * s * 0.3, hpy = Math.sin(ha) * s * 0.3; if (!hx) c.moveTo(hpx,hpy); else c.lineTo(hpx,hpy); }
+    c.closePath(); c.lineWidth = s * 0.09; c.stroke();
+    c.fillRect(-s * 0.07, -s * 0.07, s * 0.14, s * 0.14);
+  } else if (skin.face === 'target') {
+    c.beginPath(); c.arc(0, 0, s * 0.29, 0, Math.PI * 2); c.lineWidth = s * 0.07; c.stroke();
+    c.beginPath(); c.arc(0, 0, s * 0.12, 0, Math.PI * 2); c.fill();
+  } else if (skin.face === 'flame') {
+    c.beginPath(); c.moveTo(0, s * 0.34); c.bezierCurveTo(-s * 0.34, s * 0.05, -s * 0.05, -s * 0.12, s * 0.08, -s * 0.36);
+    c.bezierCurveTo(s * 0.13, -s * 0.08, s * 0.38, 0, 0, s * 0.34); c.fill();
+    c.fillStyle = skin.c1; c.beginPath(); c.moveTo(0, s * 0.2); c.quadraticCurveTo(-s * 0.1, 0, s * 0.08, -s * 0.12);
+    c.quadraticCurveTo(s * 0.2, s * 0.08, 0, s * 0.2); c.fill();
   }
   c.restore();
 }
@@ -1711,6 +1760,48 @@ function drawPlayerAura(p, sk) {
   ctx.restore();
 }
 
+function drawCubeLite(c, skin, size) {
+  var h = size / 2;
+  // Flat fills and a few crisp shapes: richer than the old fallback without blur or gradients.
+  c.fillStyle = skin.c2;
+  c.fillRect(-h, -h, size, size);
+  c.fillStyle = skin.c1;
+  c.fillRect(-h + 3, -h + 3, size - 6, size - 6);
+  c.fillStyle = 'rgba(255,255,255,0.18)';
+  c.fillRect(-h + 4, -h + 4, size - 8, size * 0.16);
+  c.lineWidth = Math.max(2, size * 0.055);
+  c.strokeStyle = '#ffffff';
+  c.strokeRect(-h + 1.5, -h + 1.5, size - 3, size - 3);
+  c.fillStyle = 'rgba(4,8,22,0.88)';
+  c.fillRect(-h * 0.66, -h * 0.66, size * 0.66, size * 0.66);
+  c.fillStyle = '#ffffff';
+  if (skin.face === 'diamond') {
+    c.beginPath(); c.moveTo(0,-size*0.27); c.lineTo(size*0.22,0); c.lineTo(0,size*0.27); c.lineTo(-size*0.22,0); c.closePath(); c.fill();
+  } else if (skin.face === 'bolt') {
+    c.beginPath(); c.moveTo(size*0.06,-size*0.3); c.lineTo(-size*0.2,size*0.02); c.lineTo(-size*0.01,size*0.02); c.lineTo(-size*0.07,size*0.3); c.lineTo(size*0.22,-size*0.08); c.lineTo(size*0.04,-size*0.08); c.closePath(); c.fill();
+  } else if (skin.face === 'eye') {
+    c.beginPath(); c.ellipse(0,0,size*0.28,size*0.15,0,0,Math.PI*2); c.fill();
+    c.fillStyle = skin.c1; c.beginPath(); c.arc(0,0,size*0.09,0,Math.PI*2); c.fill();
+  } else if (skin.face === 'hex') {
+    c.strokeStyle='#ffffff'; c.lineWidth=size*0.07; c.beginPath();
+    for(var q=0;q<6;q++){var a=q*Math.PI/3,px=Math.cos(a)*size*0.25,py=Math.sin(a)*size*0.25;if(!q)c.moveTo(px,py);else c.lineTo(px,py);}
+    c.closePath(); c.stroke();
+  } else if (skin.face === 'target') {
+    c.beginPath(); c.arc(0,0,size*0.25,0,Math.PI*2); c.lineWidth=size*0.06; c.stroke();
+    c.beginPath(); c.arc(0,0,size*0.09,0,Math.PI*2); c.fill();
+  } else if (skin.face === 'flame') {
+    c.beginPath(); c.moveTo(0,size*0.27); c.quadraticCurveTo(-size*0.3,0,size*0.08,-size*0.3); c.quadraticCurveTo(size*0.3,0,0,size*0.27); c.fill();
+  } else if (skin.face === 'cross') {
+    c.fillRect(-size*0.28,-size*0.055,size*0.56,size*0.11); c.fillRect(-size*0.055,-size*0.28,size*0.11,size*0.56);
+  } else if (skin.face === 'star') {
+    c.beginPath(); for(var z=0;z<10;z++){var aa=-Math.PI/2+z*Math.PI/5,rr=z%2?size*0.12:size*0.28,xx=Math.cos(aa)*rr,yy=Math.sin(aa)*rr;if(!z)c.moveTo(xx,yy);else c.lineTo(xx,yy);} c.closePath(); c.fill();
+  } else {
+    c.fillRect(-size*0.28,-size*0.23,size*0.13,size*0.18);
+    c.fillRect(size*0.13,-size*0.23,size*0.13,size*0.18);
+    c.fillRect(-size*0.2,size*0.14,size*0.4,size*0.07);
+  }
+}
+
 function drawPlayer() {
   if (Game.state === 'dead') return;
   var p = player, sk = currentSkin();
@@ -1737,19 +1828,8 @@ function drawPlayer() {
   ctx.shadowColor = sk.c1;
   ctx.shadowBlur = LOW_POWER ? 0 : 22;
   if (p.mode === 'cube') {
-    if (LOW_POWER) {
-      var halfBlock = CFG.BLOCK / 2;
-      ctx.fillStyle = sk.c1;
-      ctx.fillRect(-halfBlock, -halfBlock, CFG.BLOCK, CFG.BLOCK);
-      ctx.lineWidth = 3;
-      ctx.strokeStyle = '#ffffff';
-      ctx.strokeRect(-halfBlock + 1.5, -halfBlock + 1.5, CFG.BLOCK - 3, CFG.BLOCK - 3);
-      ctx.fillStyle = 'rgba(4,8,22,0.85)';
-      ctx.fillRect(-halfBlock * 0.52, -halfBlock * 0.52, CFG.BLOCK * 0.52, CFG.BLOCK * 0.52);
-      ctx.fillStyle = '#ffffff';
-      ctx.fillRect(-halfBlock * 0.34, -halfBlock * 0.26, CFG.BLOCK * 0.13, CFG.BLOCK * 0.16);
-      ctx.fillRect(halfBlock * 0.08, -halfBlock * 0.26, CFG.BLOCK * 0.13, CFG.BLOCK * 0.16);
-    } else drawCubeShape(ctx, sk, CFG.BLOCK);
+    if (LOW_POWER) drawCubeLite(ctx, sk, CFG.BLOCK);
+    else drawCubeShape(ctx, sk, CFG.BLOCK);
   } else {
     drawShip(sk);
   }
@@ -2068,13 +2148,20 @@ function buildSkinUI() {
       var unlocked = skinUnlocked(i);
       var div = document.createElement('div');
       div.className = 'skin' + (i === save.skin ? ' selected' : '') + (unlocked ? '' : ' locked');
-      if (!unlocked) div.setAttribute('data-lock', s.unlock + '%');
+      var lockText = s.unlock <= 100 ? s.unlock + '%' : 'ENDLESS ' + (s.unlock * 8) + 'm';
+      if (!unlocked) div.setAttribute('data-lock', lockText);
+      div.setAttribute('title', s.name + (unlocked ? '' : ' · Unlock: ' + lockText));
+      div.setAttribute('aria-label', s.name + (unlocked ? ' skin' : ' locked'));
       var cv = document.createElement('canvas');
       cv.width = 96; cv.height = 96;
       var c2 = cv.getContext('2d');
       c2.translate(48, 48);
       drawCubeShape(c2, s, 74);
       div.appendChild(cv);
+      var nameTag = document.createElement('span');
+      nameTag.className = 'skin-name';
+      nameTag.textContent = s.name;
+      div.appendChild(nameTag);
       if (unlocked) {
         div.addEventListener('click', function () {
           save.skin = i; persistSoon();
