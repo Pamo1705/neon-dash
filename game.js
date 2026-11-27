@@ -870,7 +870,7 @@ function buildNoise() {
 
 function resize() {
   // High-DPI canvases multiply the pixels rendered every frame.
-  DPR = Math.min(window.devicePixelRatio || 1, LOW_POWER ? 1 : 1.5);
+  DPR = Math.min(window.devicePixelRatio || 1, LOW_POWER ? 0.85 : 1.5);
   var w = canvas.clientWidth || window.innerWidth;
   var h = canvas.clientHeight || window.innerHeight;
   canvas.width = Math.round(w * DPR);
@@ -895,8 +895,21 @@ function drawBackground() {
   var w = canvas.width / DPR, h = canvas.height / DPR;
   ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
   var pal = currentPalette();
-  var beat = Audio.getBeat();
+  var beat = LOW_POWER ? 0 : Audio.getBeat();
   var groundCss = (-Game.camY) * S;
+
+  if (LOW_POWER) {
+    // Minimal backdrop: avoid animated radial gradients and per-star drawing.
+    ctx.fillStyle = rgb(pal.sky2);
+    ctx.fillRect(0, 0, w, h);
+    ctx.fillStyle = rgb(pal.sky0, 0.55);
+    ctx.fillRect(0, 0, w, Math.max(0, groundCss));
+    ctx.fillStyle = rgb(pal.floor, 0.95);
+    ctx.fillRect(0, groundCss, w, Math.max(0, h - groundCss));
+    ctx.fillStyle = rgb(pal.grid, 0.7);
+    ctx.fillRect(0, groundCss, w, 2);
+    return;
+  }
 
   // Layer 1 — deep nebula gradient sky
   var g = ctx.createLinearGradient(0, 0, 0, h);
@@ -1112,8 +1125,20 @@ function drawFilmGrain(w, h) {
 }
 
 function drawGrid() {
-  var beat = Audio.getBeat();
+  var beat = LOW_POWER ? 0 : Audio.getBeat();
   var pal = currentPalette();
+  if (LOW_POWER) {
+    var lowLeft = Game.camX - 40, lowRight = Game.camX + viewW + 40;
+    ctx.strokeStyle = rgb(pal.grid, 0.16);
+    ctx.lineWidth = 1 / S;
+    ctx.beginPath();
+    for (var lx = Math.floor(lowLeft / (CFG.BLOCK * 2)) * CFG.BLOCK * 2; lx < lowRight; lx += CFG.BLOCK * 2) {
+      ctx.moveTo(lx, 0); ctx.lineTo(lx, CFG.BLOCK * 6);
+    }
+    ctx.moveTo(lowLeft, 0); ctx.lineTo(lowRight, 0);
+    ctx.stroke();
+    return;
+  }
   ctx.lineWidth = 1.5 / S;
   ctx.strokeStyle = rgb(pal.grid, 0.10 + beat * 0.18);
   var left = Game.camX - 40;
@@ -1623,9 +1648,21 @@ function drawPlayer() {
   var stretch = (!p.onGround && p.mode === 'cube') ? clamp(Math.abs(p.vy) / CFG.MAX_FALL, 0, 1) * 0.18 : 0;
   ctx.scale(1 + sq * 0.25 - stretch * 0.5, 1 - sq * 0.25 + stretch);
   ctx.shadowColor = sk.c1;
-  ctx.shadowBlur = 22;
+  ctx.shadowBlur = LOW_POWER ? 0 : 22;
   if (p.mode === 'cube') {
-    drawCubeShape(ctx, sk, CFG.BLOCK);
+    if (LOW_POWER) {
+      var halfBlock = CFG.BLOCK / 2;
+      ctx.fillStyle = sk.c1;
+      ctx.fillRect(-halfBlock, -halfBlock, CFG.BLOCK, CFG.BLOCK);
+      ctx.lineWidth = 3;
+      ctx.strokeStyle = '#ffffff';
+      ctx.strokeRect(-halfBlock + 1.5, -halfBlock + 1.5, CFG.BLOCK - 3, CFG.BLOCK - 3);
+      ctx.fillStyle = 'rgba(4,8,22,0.85)';
+      ctx.fillRect(-halfBlock * 0.52, -halfBlock * 0.52, CFG.BLOCK * 0.52, CFG.BLOCK * 0.52);
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(-halfBlock * 0.34, -halfBlock * 0.26, CFG.BLOCK * 0.13, CFG.BLOCK * 0.16);
+      ctx.fillRect(halfBlock * 0.08, -halfBlock * 0.26, CFG.BLOCK * 0.13, CFG.BLOCK * 0.16);
+    } else drawCubeShape(ctx, sk, CFG.BLOCK);
   } else {
     drawShip(sk);
   }
@@ -1929,7 +1966,7 @@ function frame(now) {
     update(dt, false);
   }
   // Keep simulation/input responsive while limiting costly canvas work on weaker devices.
-  if (!LOW_POWER || now - lastDraw >= 25) {
+  if (!LOW_POWER || now - lastDraw >= 1000 / 30) {
     render();
     lastDraw = now;
   }
