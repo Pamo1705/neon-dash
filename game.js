@@ -1830,8 +1830,9 @@ function drawPlayer() {
   ctx.shadowColor = sk.c1;
   ctx.shadowBlur = LOW_POWER ? 0 : 22;
   if (p.mode === 'cube') {
-    if (LOW_POWER) drawCubeLite(ctx, sk, CFG.BLOCK);
-    else drawCubeShape(ctx, sk, CFG.BLOCK);
+    // Use the exact same cube renderer as the menu skin previews on every device.
+    // Low-power mode still disables the expensive glow/shadow above.
+    drawCubeShape(ctx, sk, CFG.BLOCK);
   } else {
     drawShip(sk);
   }
